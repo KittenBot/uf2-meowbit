@@ -2,6 +2,7 @@
 
 // clang-format off
 const uint32_t configValues[] = {
+    // riven, adapt to meowbit
     CFG_PIN_DISPLAY_CS,      PB_12,
     CFG_PIN_DISPLAY_SCK,     PB_13,
     CFG_PIN_DISPLAY_MOSI,    PB_15,
@@ -10,7 +11,7 @@ const uint32_t configValues[] = {
     CFG_PIN_DISPLAY_RST,     PC_4,
     CFG_DISPLAY_WIDTH,       160,
     CFG_DISPLAY_HEIGHT,      128,
-    CFG_DISPLAY_CFG0,        0x00000080,
+    CFG_DISPLAY_CFG0,        0x00020140, // 0x00000080
     CFG_DISPLAY_CFG1,        0x000603,
     CFG_DISPLAY_CFG2,        22,
 #if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
@@ -21,7 +22,7 @@ const uint32_t configValues[] = {
     CFG_PIN_BTN_A,           PB_1,
     CFG_PIN_BTN_B,           PB_0,
     CFG_PIN_BTN_MENU,        PC_10,
-    CFG_PIN_DISPLAY_BL,      PC_7,
+    CFG_PIN_DISPLAY_BL,      PC_7, // origin PC_7, riven
 
 #ifdef TARGET_HW_BRAINGAMES_REVB
     CFG_PIN_JACK_SND,        PA_8,

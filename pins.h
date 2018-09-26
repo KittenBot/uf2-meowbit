@@ -49,6 +49,10 @@
 #define PC_14 0x2E
 #define PC_15 0x2F
 
+#define PD_0 0x30
+#define PD_1 0x31
+#define PD_2 0x32
+
 #define CFG_PIN_ACCELEROMETER_INT 1
 #define CFG_PIN_ACCELEROMETER_SCL 2
 #define CFG_PIN_ACCELEROMETER_SDA 3
