@@ -10,3 +10,5 @@ Bootloader.zip
 Bootloader.sublime-workspace
 .gdbinit
 .vscode
+.idea
+/build
