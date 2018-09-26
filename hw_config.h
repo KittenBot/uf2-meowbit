@@ -964,7 +964,7 @@
 #else
 # define USBDEVICESTRING                "BrainGames RevA"
 #endif
-# define OSC_FREQ                       8
+# define OSC_FREQ                       12
 #endif
 # define USBPRODUCTID                   0x1042
 
