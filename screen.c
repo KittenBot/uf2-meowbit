@@ -223,6 +223,7 @@ extern const uint8_t fileLogo[];
 extern const uint8_t pendriveLogo[];
 extern const uint8_t arrowLogo[];
 extern const uint8_t ghiLogo[];
+extern const uint8_t kittenLogo[];
 
 static void printch(int x, int y, int col, const uint8_t *fnt) {
     for (int i = 0; i < 8; ++i) {
@@ -412,9 +413,9 @@ void screen_init() {
     print(DRAGX - 2, DRAG + 37, 1, "arcade.uf2");
     print(DRAGX + 95, DRAG + 37, 1, "ARCADE");
 
-    drawBar(128-45, 45, 3);
-    printicon(DISPLAY_WIDTH - 36, 90, 1, mkcdLogo);
-    printicon(5, 90, 1, ghiLogo);
+    drawBar(128-45, 45, 9);
+    // printicon(DISPLAY_WIDTH - 36, 90, 1, mkcdLogo);
+    printicon(5, 90, 0, kittenLogo);
     print(40, 99, 1, USBDEVICESTRING);
 
     draw_screen();

@@ -960,7 +960,8 @@
 # define OSC_FREQ                       12
 #else
 #ifdef TARGET_HW_BRAINGAMES_REVB
-# define USBDEVICESTRING                "BrainGames RevB"
+// # define USBDEVICESTRING                "BrainGames RevB"
+# define USBDEVICESTRING                "MeowBit Alpha"
 #else
 # define USBDEVICESTRING                "BrainGames RevA"
 #endif
@@ -984,7 +985,8 @@
 //# define BOARD_PIN_VBUS                 GPIO5
 //# define BOARD_PORT_VBUS                GPIOC
 
-# define USBMFGSTRING                   "GHI Electronics"
+// # define USBMFGSTRING                   "GHI Electronics"
+# define USBMFGSTRING                   "Kittenbot"
 
 #else
 # error Undefined Target Hardware

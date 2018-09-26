@@ -15,13 +15,13 @@ const uint32_t configValues[] = {
     CFG_DISPLAY_CFG1,        0x000603,
     CFG_DISPLAY_CFG2,        22,
 #if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
-    CFG_PIN_BTN_UP,          PA_5,
-    CFG_PIN_BTN_LEFT,        PA_15,
-    CFG_PIN_BTN_DOWN,        PB_10,
-    CFG_PIN_BTN_RIGHT,       PC_13,
-    CFG_PIN_BTN_A,           PB_1,
-    CFG_PIN_BTN_B,           PB_0,
-    CFG_PIN_BTN_MENU,        PC_10,
+    CFG_PIN_BTN_UP,          PC_10, //PA_5,
+    CFG_PIN_BTN_LEFT,        PC_11, //PA_15,
+    CFG_PIN_BTN_DOWN,        PC_12, //PB_10,
+    CFG_PIN_BTN_RIGHT,       PC_13, //PC_13,
+    CFG_PIN_BTN_A,           PB_1,// PB_1,
+    CFG_PIN_BTN_B,           PB_2,// PB_0,
+    CFG_PIN_BTN_MENU,        PC_15, // PC_10,
     CFG_PIN_DISPLAY_BL,      PC_7, // origin PC_7, riven
 
 #ifdef TARGET_HW_BRAINGAMES_REVB
