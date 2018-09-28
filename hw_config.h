@@ -954,7 +954,19 @@
 # define BOOTLOADER_DELAY               1000
 # define BOARD_OMNIBUSF4SD
 # define INTERFACE_USB                  1
-# define INTERFACE_USART                0
+# define INTERFACE_USART                1
+// riven board usart for nrf comm
+# define BOARD_USART  					USART2
+# define BOARD_USART_CLOCK_REGISTER 	RCC_APB1ENR
+# define BOARD_USART_CLOCK_BIT      	RCC_APB1ENR_USART2EN
+# define BOARD_PORT_USART   			GPIOA
+# define BOARD_PORT_USART_AF 			GPIO_AF7
+# define BOARD_PIN_TX     				GPIO2
+# define BOARD_PIN_RX		     		GPIO3
+# define BOARD_USART_PIN_CLOCK_REGISTER RCC_AHB1ENR
+# define BOARD_USART_PIN_CLOCK_BIT  	RCC_AHB1ENR_IOPAEN
+# define  SERIAL_BREAK_DETECT_DISABLED   1
+
 #ifdef TARGET_HW_BRAINPAD
 # define USBDEVICESTRING                "BrainPad"
 # define OSC_FREQ                       12

@@ -860,6 +860,13 @@ main(void)
 			continue;
 		}
 
+#if INTERFACE_USART
+        /* if the USART port RX line is still receiving a break, just loop back */
+		if (board_test_usart_receiving_break()) {
+			continue;
+		}
+#endif
+
 		board_set_rtc_signature(0);
 
 		/* look to see if we can boot the app */
