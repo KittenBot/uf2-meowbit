@@ -46,6 +46,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/flash.h>
+#include <libopencm3/stm32/usart.h>
 
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
@@ -66,6 +67,11 @@ inline void cfini(void) {
 }
 
 static enum led_state { LED_BLINK, LED_ON, LED_OFF } _led_state;
+#if INTERFACE_USART
+uint8_t uart_buf[512];
+uint8_t uart_cnt=0;
+uint8_t uart_state=0;
+#endif
 
 void sys_tick_handler(void);
 
@@ -254,7 +260,14 @@ void bootloader(unsigned timeout) {
                 screen_init();
             }
         }
-
+#if INTERFACE_USART
+        if (USART_SR(BOARD_USART) & USART_SR_RXNE) { // USART_SR_RXNE // USART_FLAG_RXNE
+            uart_buf[uart_cnt++] = usart_recv(BOARD_USART);
+            if (uart_cnt == 512){
+                write_block(0, uart_buf);
+            }
+        }
+#endif
         usb_callback();
     }
 }
