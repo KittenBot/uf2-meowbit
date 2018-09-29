@@ -28,3 +28,5 @@ The UF2 stuff was mostly lifted from https://github.com/Microsoft/uf2-samdx1
 by way of (non-working) https://github.com/Microsoft/uf2-nrf5
 
 The dmesg subsystem is adapted from https://github.com/lancaster-university/codal-core
+
+dfu-util -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
