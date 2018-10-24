@@ -404,6 +404,11 @@ board_init(void)
 	gpio_set_output_options(BOARD_FORCE_BL_PORT, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, BOARD_FORCE_BL_PIN_OUT);
 #endif
 
+#if defined(BOARD_PORT_BACKLIGHT)
+	gpio_mode_setup(BOARD_PORT_BACKLIGHT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, BOARD_PIN_BACKLIGHT);
+	gpio_set(BOARD_PORT_BACKLIGHT, BOARD_PIN_BACKLIGHT);
+#endif
+
 #if defined(BOARD_FORCE_BL_PIN)
 	/* configure the force BL pins */
 	rcc_peripheral_enable_clock(&BOARD_FORCE_BL_CLOCK_REGISTER, BOARD_FORCE_BL_CLOCK_BIT);
