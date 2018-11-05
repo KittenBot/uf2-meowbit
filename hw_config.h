@@ -954,7 +954,7 @@
 # define BOOTLOADER_DELAY               1000
 # define BOARD_OMNIBUSF4SD
 # define INTERFACE_USB                  1
-# define INTERFACE_USART                1
+# define INTERFACE_USART                0
 // riven board usart for nrf comm
 # define BOARD_USART  					USART2
 # define BOARD_USART_CLOCK_REGISTER 	RCC_APB1ENR
@@ -988,8 +988,8 @@
 # define BOARD_FLASH_SIZE               (512 * 1024)
 
 
-# define BOARD_PIN_LED_ACTIVITY         GPIO8
-# define BOARD_PIN_LED_BOOTLOADER       GPIO9
+# define BOARD_PIN_LED_ACTIVITY         GPIO15
+# define BOARD_PIN_LED_BOOTLOADER       GPIO14
 # define BOARD_PORT_LEDS                GPIOC
 # define BOARD_CLOCK_LEDS               RCC_AHB1ENR_IOPCEN
 # define BOARD_LED_ON                   gpio_set
