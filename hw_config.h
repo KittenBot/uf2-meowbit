@@ -988,8 +988,8 @@
 # define BOARD_FLASH_SIZE               (512 * 1024)
 
 
-# define BOARD_PIN_LED_ACTIVITY         GPIO4
-# define BOARD_PIN_LED_BOOTLOADER       GPIO5
+# define BOARD_PIN_LED_ACTIVITY         GPIO5
+# define BOARD_PIN_LED_BOOTLOADER       GPIO4
 # define BOARD_PORT_LEDS                GPIOB
 # define BOARD_CLOCK_LEDS               RCC_AHB1ENR_IOPBEN
 # define BOARD_LED_ON                   gpio_set

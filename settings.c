@@ -18,11 +18,11 @@ const uint32_t configValues[] = {
     CFG_PIN_BTN_UP,          PA_6, //PA_5,
     CFG_PIN_BTN_LEFT,        PA_7, //PA_15,
     CFG_PIN_BTN_DOWN,        PA_5, //PB_10,
-    CFG_PIN_BTN_RIGHT,       PC_3, //PC_13,
+    CFG_PIN_BTN_RIGHT,       PB_2, //PC_13,
     CFG_PIN_BTN_A,           PB_9,// PB_1,
-    CFG_PIN_BTN_B,           PB_2,// PB_0,
+    CFG_PIN_BTN_B,           PC_3,// PB_0,
     CFG_PIN_BTN_MENU,        PC_15, // PC_10,
-    CFG_PIN_DISPLAY_BL,      PB_0, // origin PC_7, riven
+    CFG_PIN_DISPLAY_BL,      PB_3, // origin PC_7, riven
 
 #ifdef TARGET_HW_BRAINGAMES_REVB
     CFG_PIN_JACK_SND,        PB_8,
