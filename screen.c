@@ -110,6 +110,8 @@ static const uint8_t initCmds[] = {
     ST7735_SLPOUT ,   DELAY,  //  2: Out of sleep mode, 0 args, w/delay
       120,                    //     500 ms delay
     ST7735_INVOFF , 0      ,  // 13: Don't invert display, no args, no delay
+    ST7735_INVCTR , 1      ,  // inverse, riven
+      0x03,
     ST7735_COLMOD , 1      ,  // 15: set color mode, 1 arg, no delay:
       0x05,                  //     16-bit color
     ST7735_GMCTRP1, 16      , //  1: Magical unicorn dust, 16 args, no delay:

@@ -11,8 +11,8 @@ const uint32_t configValues[] = {
     CFG_PIN_DISPLAY_RST,     PB_10,
     CFG_DISPLAY_WIDTH,       160,
     CFG_DISPLAY_HEIGHT,      128,
-    CFG_DISPLAY_CFG0,        0x00020140, // 0x00000080
-    CFG_DISPLAY_CFG1,        0x000603,
+    CFG_DISPLAY_CFG0,        0x00000040, // 0x00020140 0x00000080
+    CFG_DISPLAY_CFG1,        0x000603, // 0x000603
     CFG_DISPLAY_CFG2,        22,
 #if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
     CFG_PIN_BTN_UP,          PA_6, //PA_5,
