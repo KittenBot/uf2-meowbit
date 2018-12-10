@@ -963,8 +963,8 @@
 # define BOARD_PORT_USART_AF 			GPIO_AF7
 # define BOARD_PIN_TX     				GPIO2
 # define BOARD_PIN_RX		     		GPIO3
-// # define BOARD_PORT_BACKLIGHT  			GPIOA
-// # define BOARD_PIN_BACKLIGHT     		GPIO8
+# define BOARD_PORT_BACKLIGHT  			GPIOB
+# define BOARD_PIN_BACKLIGHT     		GPIO3
 # define BOARD_USART_PIN_CLOCK_REGISTER RCC_AHB1ENR
 # define BOARD_USART_PIN_CLOCK_BIT  	RCC_AHB1ENR_IOPAEN
 # define  SERIAL_BREAK_DETECT_DISABLED   1
@@ -975,7 +975,7 @@
 #else
 #ifdef TARGET_HW_BRAINGAMES_REVB
 // # define USBDEVICESTRING                "BrainGames RevB"
-# define USBDEVICESTRING                "MeowBit Alpha"
+# define USBDEVICESTRING                "MeowBit V1"
 #else
 # define USBDEVICESTRING                "BrainGames RevA"
 #endif
