@@ -6,9 +6,10 @@
 *.d
 *.elf
 *.bin
+*.map
 Bootloader.zip
 Bootloader.sublime-workspace
 .gdbinit
 .vscode
-.idea
-/build
+build
+tmp

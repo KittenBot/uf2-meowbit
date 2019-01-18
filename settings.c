@@ -1,77 +1,70 @@
 #include "bl.h"
 
-// clang-format off
-const uint32_t configValues[] = {
-    // riven, adapt to meowbit
-    CFG_PIN_DISPLAY_CS,      PB_12,
-    CFG_PIN_DISPLAY_SCK,     PB_13,
-    CFG_PIN_DISPLAY_MOSI,    PB_15,
-    CFG_PIN_DISPLAY_MISO,    PB_14,
-    CFG_PIN_DISPLAY_DC,      PA_8,
-    CFG_PIN_DISPLAY_RST,     PB_10,
-    CFG_DISPLAY_WIDTH,       160,
-    CFG_DISPLAY_HEIGHT,      128,
-    CFG_DISPLAY_CFG0,        0x00000040, // 0x00020140 0x00000080
-    CFG_DISPLAY_CFG1,        0x000603, // 0x000603
-    CFG_DISPLAY_CFG2,        22,
-#if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
-    CFG_PIN_BTN_UP,          PA_6, //PA_5,
-    CFG_PIN_BTN_LEFT,        PA_7, //PA_15,
-    CFG_PIN_BTN_DOWN,        PA_5, //PB_10,
-    CFG_PIN_BTN_RIGHT,       PB_2, //PC_13,
-    CFG_PIN_BTN_A,           PB_9,// PB_1,
-    CFG_PIN_BTN_B,           PC_3,// PB_0,
-    CFG_PIN_BTN_MENU,        PC_15, // PC_10,
-    CFG_PIN_DISPLAY_BL,      PB_3, // origin PC_7, riven
-
-#ifdef TARGET_HW_BRAINGAMES_REVB
-    CFG_PIN_JACK_SND,        PB_8,
-    CFG_PIN_JACK_BZEN,       PB_5,
-    CFG_PIN_JACK_HPEN,       PB_4,
-    CFG_PIN_JACK_SENSE,      PB_3,
-    CFG_PIN_JACK_TX,         PA_2,
-    CFG_PIN_JACK_PWREN,      PA_3,
-#else
-    CFG_PIN_JACK_SND,        PA_8,
-    CFG_PIN_JACK_BZEN,       PA_10,
-    CFG_PIN_JACK_HPEN,       PA_2,
-    CFG_PIN_JACK_SENSE,      PB_3,
-    CFG_PIN_JACK_TX,         PA_9,
-    CFG_PIN_JACK_PWREN,      PB_5,
-#endif
-
-#else
-    CFG_PIN_DISPLAY_BL,      PA_4,
-    CFG_PIN_BTN_LEFT,        PB_10,
-    CFG_PIN_BTN_UP,          PA_15,
-    CFG_PIN_BTN_RIGHT,       PA_5,
-    CFG_PIN_BTN_DOWN,        PC_13,
-    CFG_PIN_BTN_A,           PB_7,
-    CFG_PIN_BTN_B,           PB_6,
-#endif
-    0, 0
+__attribute__((section(".config"))) __attribute__((used)) //
+const uint32_t configData[] = {
+    /* CF2 START */
+    513675505, 539130489, // magic
+    47, 100,  // used entries, total entries
+    1, 0x2e, // PIN_ACCELEROMETER_INT = PC14
+    2, 0x16, // PIN_ACCELEROMETER_SCL = PIN_D6
+    3, 0x17, // PIN_ACCELEROMETER_SDA = PIN_D7
+    4, 0x19, // PIN_BTN_A = PB01 PB_9
+    5, 0x23, // PIN_BTN_B = PB00 PC_3
+    13, 0x14, // PIN_LED = PC09 PB4
+    32, 0x1d, // PIN_DISPLAY_SCK = PB13
+    33, 0x1e, // PIN_DISPLAY_MISO = PB14
+    34, 0x1f, // PIN_DISPLAY_MOSI = PB15
+    35, 0x1c, // PIN_DISPLAY_CS = PB12
+    36, 0x08, // PIN_DISPLAY_DC = PC05 PA08
+    37, 0xa0, // DISPLAY_WIDTH = 160
+    38, 0x80, // DISPLAY_HEIGHT = 128
+    39, 0x40, // DISPLAY_CFG0 = 0x80
+    40, 0x603, // DISPLAY_CFG1 = 0x603
+    41, 0x16, // DISPLAY_CFG2 = 0x16
+    43, 0x1A, // PIN_DISPLAY_RST = PC04 PB10
+    44, 0x13, // PIN_DISPLAY_BL = PC07 PB03
+    45, 0x1, // PIN_SERVO_1 = PA01
+    46, 0x0, // PIN_SERVO_2 = PA00
+    47, 0x07, // PIN_BTN_LEFT = PA15 PA_7
+    48, 0x12, // PIN_BTN_RIGHT = PC13 PB_2
+    49, 0x06, // PIN_BTN_UP = PA05 PA_6
+    50, 0x05, // PIN_BTN_DOWN = PB10 PA_5
+    51, 0x2F, // PIN_BTN_MENU = PC10 PC_15
+    55, 0x15, // PIN_LED1 = PC08 PB5
+    60, 0x9, // PIN_JACK_TX = PA09
+    61, 0x6, // PIN_JACK_SENSE = PA06
+    62, 0x4, // PIN_JACK_HPEN = PA04
+    63, 0x18, // PIN_JACK_BZEN = PA10 PB8
+    64, 0x7, // PIN_JACK_PWREN = PA07
+    65, 0x8, // PIN_JACK_SND = PA08
+    66, 0x28, // PIN_JACK_BUSLED = PC08
+    67, 0x29, // PIN_JACK_COMMLED = PC09
+    70, 0x38, // ACCELEROMETER_TYPE = MMA8453
+    151, 0x2, // PIN_D1 = PA02
+    152, 0x3, // PIN_D2 = PA03
+    153, 0x13, // PIN_D3 = PB03
+    154, 0x14, // PIN_D4 = PB04
+    155, 0x15, // PIN_D5 = PB05
+    156, 0x16, // PIN_D6 = PB06
+    157, 0x17, // PIN_D7 = PB07
+    204, 0x80000, // FLASH_BYTES = 0x80000
+    205, 0x18000, // RAM_BYTES = 0x18000
+    208, 0x16e42d61, // BOOTLOADER_BOARD_ID = 0x16e42d61
+    209, 0x57755a57, // UF2_FAMILY = STM32F401
+    210, 0x10, // PINS_PORT_SIZE = PA_16
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    /* CF2 END */
 };
-// clang-format on
-
-uint32_t lookupCfg(uint32_t key, uint32_t defl) {
-    const uint32_t *ptr = configValues;
-    while (*ptr) {
-        if (*ptr == key)
-            return ptr[1];
-        ptr += 2;
-    }
-    if (defl == 0x42004200)
-        while (1)
-            ;
-    return defl;
-}
 
 extern const char infoUf2File[];
 __attribute__((section(".settings"))) __attribute__((used)) //
 const struct Settings settings = {
     .magic0 = SETTINGS_MAGIC_0,
     .magic1 = SETTINGS_MAGIC_1,
-    .configValues = configValues,
+    .configValues = configData + 4,
     .hseValue = OSC_FREQ * 1000000,
     .infoUF2 = infoUf2File,
     .manufacturer = USBMFGSTRING,

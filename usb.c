@@ -45,6 +45,9 @@
 
 #include "bl.h"
 
+#include "webusb.h"
+#include "winusb.h"
+
 /*
  * ST changed the meaning and sense of a few critical bits
  * in the USB IP block identified as 0x00002000
@@ -55,6 +58,7 @@
 #define OTG_CID_HAS_VBDEN 0x00002000
 #define OTG_GCCFG_VBDEN   (1 << 21)
 
+extern char serial_number[];
 /* Provide the stings for the Index 1-n as a requested index of 0 is used for the supported langages
  *  and is hard coded in the usb lib. The array below is indexed by requested index-1, therefore
  *  element[0] maps to requested index 1
@@ -62,7 +66,7 @@
 static const char *usb_strings[] = {
 	USBMFGSTRING, /* Maps to Index 1 Index */
 	USBDEVICESTRING,
-	"12345678901234",
+	serial_number,
 };
 #define NUM_USB_STRINGS (sizeof(usb_strings)/sizeof(usb_strings[0]))
 
@@ -74,15 +78,14 @@ static uint8_t usbd_control_buffer[128];
 static const struct usb_device_descriptor dev = {
 	.bLength = USB_DT_DEVICE_SIZE,
 	.bDescriptorType = USB_DT_DEVICE,	/**< Specifies he descriptor type */
-	.bcdUSB = 0x0200,					/**< The USB interface version, binary coded (2.0) */
-	//WEBUSB 0x0210
+	.bcdUSB = 0x0210,					/**< The USB interface version, binary coded (2.10) */
 	.bDeviceClass = 0,		/**< USB device class, CDC in this case */
 	.bDeviceSubClass = 0,
 	.bDeviceProtocol = 0,
 	.bMaxPacketSize0 = 64,
 	.idVendor = USBVENDORID,			/**< Vendor ID (VID) */
 	.idProduct = USBPRODUCTID,			/**< Product ID (PID) */
-	.bcdDevice = 0x0101,				/**< Product version. Set to 1.01 (0x0101) to agree with NuttX */
+	.bcdDevice = 0x4201,				/**< Product version. Set 0x42XX to indicate HF2 support. */
 	.iManufacturer = 1,					/**< Use string with index 1 for the manufacturer string ("3D Robotics") */
 	.iProduct = 2,						/**< Use string with index 2 for the product string (USBDEVICESTRING define) */
 	.iSerialNumber = 3,					/**< Use string with index 3 for the serial number string (empty) */
@@ -93,20 +96,36 @@ static const struct usb_device_descriptor dev = {
 static const struct usb_endpoint_descriptor msc_endp[] = {{
 	.bLength = USB_DT_ENDPOINT_SIZE,
 	.bDescriptorType = USB_DT_ENDPOINT,
-	.bEndpointAddress = 0x01,
+	.bEndpointAddress = MSC_EP_OUT,
 	.bmAttributes = USB_ENDPOINT_ATTR_BULK,
 	.wMaxPacketSize = 64,
 	.bInterval = 0,
 }, {
 	.bLength = USB_DT_ENDPOINT_SIZE,
 	.bDescriptorType = USB_DT_ENDPOINT,
-	.bEndpointAddress = 0x82,
+	.bEndpointAddress = MSC_EP_IN,
 	.bmAttributes = USB_ENDPOINT_ATTR_BULK,
 	.wMaxPacketSize = 64,
 	.bInterval = 0,
 }};
 
-static const struct usb_interface_descriptor msc_iface = {
+static const struct usb_endpoint_descriptor hf2_endp[] = {{
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = HF2_EP_OUT,
+	.bmAttributes = USB_ENDPOINT_ATTR_BULK,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+}, {
+	.bLength = USB_DT_ENDPOINT_SIZE,
+	.bDescriptorType = USB_DT_ENDPOINT,
+	.bEndpointAddress = HF2_EP_IN,
+	.bmAttributes = USB_ENDPOINT_ATTR_BULK,
+	.wMaxPacketSize = 64,
+	.bInterval = 0,
+}};
+
+static struct usb_interface_descriptor msc_iface = {
 	.bLength = USB_DT_INTERFACE_SIZE,
 	.bDescriptorType = USB_DT_INTERFACE,
 	.bInterfaceNumber = INTF_MSC,
@@ -121,18 +140,53 @@ static const struct usb_interface_descriptor msc_iface = {
 	.extralen = 0
 };
 
+static const struct usb_interface_descriptor hf2_iface = {
+	.bLength = USB_DT_INTERFACE_SIZE,
+	.bDescriptorType = USB_DT_INTERFACE,
+	.bInterfaceNumber = INTF_HF2,
+	.bAlternateSetting = 0,
+	.bNumEndpoints = 2,
+	.bInterfaceClass = 0xFF,
+	.bInterfaceSubClass = 42,
+	.bInterfaceProtocol = 1,
+	.iInterface = 0,
+	.endpoint = hf2_endp,
+	.extra = NULL,
+	.extralen = 0
+};
+
 static const struct usb_interface ifaces[] = {
     {
         .num_altsetting = 1,
         .altsetting = &msc_iface,
     },    
+    {
+        .num_altsetting = 1,
+        .altsetting = &hf2_iface,
+    },    
+};
+
+extern const struct winusb_platform_descriptor winusb_cap;
+
+// WEBUSB It seems the MS capability thingy is missing here
+static const struct usb_device_capability_descriptor* capabilities[] = {
+    (const struct usb_device_capability_descriptor*)&webusb_platform,
+    (const struct usb_device_capability_descriptor*)&winusb_cap,
+};
+
+static const struct usb_bos_descriptor bos = {
+    .bLength = USB_DT_BOS_SIZE,
+    .bDescriptorType = USB_DT_BOS,
+    .wTotalLength = USB_DT_BOS_SIZE + sizeof(webusb_platform),
+    .bNumDeviceCaps = sizeof(capabilities)/sizeof(capabilities[0]),
+    .capabilities = capabilities
 };
 
 static const struct usb_config_descriptor config = {
 	.bLength = USB_DT_CONFIGURATION_SIZE,
 	.bDescriptorType = USB_DT_CONFIGURATION,
 	.wTotalLength = 0,
-	.bNumInterfaces = 1,
+	.bNumInterfaces = 2,
 	.bConfigurationValue = 1,
 	.iConfiguration = 0,
 	.bmAttributes = 0x80,
@@ -159,9 +213,16 @@ static void usb_set_config(usbd_device *usbd_dev, uint16_t wValue)
 	usb_enumerated();
 }
 
+void hf2_init(usbd_device *usbd_dev);
+
 void
 usb_cinit(void)
 {
+	if (hf2_mode) {
+		// disable MSC interface in HF2 mode
+		msc_iface.bInterfaceClass = 0xfe;
+	}
+
 #if defined(STM32F4)
 
 	rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPAEN);
@@ -189,7 +250,7 @@ usb_cinit(void)
 	OTG_FS_GCCFG |= OTG_GCCFG_NOVBUSSENS;
 #endif
 
-	usbd_dev = usbd_init(&otgfs_usb_driver, &dev, &config, usb_strings, NUM_USB_STRINGS,
+	usbd_dev = usbd_init(&otgfs_usb_driver, &dev, &config, &bos, usb_strings, NUM_USB_STRINGS,
 			     usbd_control_buffer, sizeof(usbd_control_buffer));
 
 #elif defined(STM32F1)
@@ -201,8 +262,13 @@ usb_cinit(void)
 			     usbd_control_buffer, sizeof(usbd_control_buffer));
 #endif
 
-	usb_msc_init(usbd_dev, 0x82, 64, 0x01, 64, "Example Ltd", "UF2 Bootloader",
-		    "42.00", UF2_NUM_BLOCKS, read_block, write_block);
+	if (!hf2_mode)
+		usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "UF2 Bootloader",
+				"42.00", UF2_NUM_BLOCKS, read_block, write_block);
+
+	hf2_init(usbd_dev);
+
+	winusb_setup(usbd_dev);
 
 #if defined(STM32F4)
 

@@ -10,10 +10,6 @@
 #define DISPLAY_WIDTH 160
 #define DISPLAY_HEIGHT 128
 
-#define SPIx SPI2
-#define SPI_AF GPIO_AF5
-#define SPI_CLOCK RCC_SPI2
-
 #define ST7735_NOP 0x00
 #define ST7735_SWRESET 0x01
 #define ST7735_RDDID 0x04
@@ -60,44 +56,26 @@
 #define ST7735_GMCTRP1 0xE0
 #define ST7735_GMCTRN1 0xE1
 
-void panic() {
-    for (;;)
-        ;
-}
+void transfer(uint8_t *ptr, uint32_t len) {
+    int mosi = CFG(PIN_DISPLAY_MOSI);
+    int sck = CFG(PIN_DISPLAY_SCK);
+    assert(pinport(mosi) == pinport(sck));
+    volatile uint32_t *port = &GPIO_BSRR(pinport(mosi));
+    uint32_t mosi_mask = pinmask(mosi);
+    uint32_t sck_mask = pinmask(sck);
 
-uint32_t pinport(int pin) {
-    switch (pin >> 4) {
-    case 0:
-        return GPIOA;
-    case 1:
-        return GPIOB;
-    case 2:
-        return GPIOC;
-    default:
-        panic();
-        return 0;
-    }
-}
-
-uint16_t pinmask(int pin) {
-    return 1 << (pin & 0xf);
-}
-
-void setup_pin(int pin, int mode) {
-    uint32_t port = pinport(pin);
-    uint32_t mask = pinmask(pin);
-    gpio_mode_setup(port, mode, GPIO_PUPD_NONE, mask);
-    if (pin != CFG(PIN_DISPLAY_MISO))
-        gpio_set_output_options(port, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, mask);
-    if (mode == GPIO_MODE_AF)
-        gpio_set_af(port, SPI_AF, mask);
-}
-
-void pin_set(int pin, int v) {
-    if (v) {
-        gpio_set(pinport(pin), pinmask(pin));
-    } else {
-        gpio_clear(pinport(pin), pinmask(pin));
+    uint8_t mask = 0, b;
+    for (;;) {
+        if (!mask) {
+            if (!len--)
+                break;
+            mask = 0x80;
+            b = *ptr++;
+        }
+        *port = (b & mask) ? mosi_mask : (mosi_mask << 16);
+        *port = sck_mask;
+        mask >>= 1;
+        *port = sck_mask << 16;
     }
 }
 
@@ -134,14 +112,8 @@ static const uint8_t initCmds[] = {
 
 static uint8_t cmdBuf[20];
 
-static void transfer(uint8_t *buf, int len) {
-    while (len--) {
-        spi_xfer(SPIx, *buf++);
-    }
-}
-
-#define SET_DC(v) pin_set(CFG(PIN_DISPLAY_DC), v)
-#define SET_CS(v) pin_set(CFG(PIN_DISPLAY_CS), v)
+#define SET_DC(v) pin_set(CFG_PIN_DISPLAY_DC, v)
+#define SET_CS(v) pin_set(CFG_PIN_DISPLAY_CS, v)
 
 static void sendCmd(uint8_t *buf, int len) {
     // make sure cmd isn't on stack
@@ -241,6 +213,23 @@ static void printch(int x, int y, int col, const uint8_t *fnt) {
     }
 }
 
+static void printch4(int x, int y, int col, const uint8_t *fnt) {
+    for (int i = 0; i < 8 * 4; ++i) {
+        uint8_t *p = fb + (x + i) * DISPLAY_HEIGHT + y;
+        uint8_t mask = 0x01;
+        for (int j = 0; j < 8; ++j) {
+            for (int k = 0; k < 4; ++k) {
+                if (*fnt & mask)
+                    *p = col;
+                p++;
+            }
+            mask <<= 1;
+        }
+        if ((i & 3) == 3)
+            fnt++;
+    }
+}
+
 void printicon(int x, int y, int col, const uint8_t *icon) {
     int w = *icon++;
     int h = *icon++;
@@ -294,10 +283,12 @@ void print(int x, int y, int col, const char *text) {
             y += 10;
             continue;
         }
+        /*
         if (x + 8 > DISPLAY_WIDTH) {
             x = x0;
             y += 10;
         }
+        */
         if (c < ' ')
             c = '?';
         if (c >= 0x7f)
@@ -305,6 +296,15 @@ void print(int x, int y, int col, const char *text) {
         c -= ' ';
         printch(x, y, col, &font8[c * 8]);
         x += 8;
+    }
+}
+
+void print4(int x, int y, int col, const char *text) {
+    while (*text) {
+        char c = *text++;
+        c -= ' ';
+        printch4(x, y, col, &font8[c * 8]);
+        x += 8 * 4;
     }
 }
 
@@ -319,26 +319,8 @@ void draw_screen() {
     for (int i = 0; i < DISPLAY_WIDTH; ++i) {
         for (int j = 0; j < DISPLAY_HEIGHT; ++j) {
             uint16_t color = palette[*p++ & 0xf];
-            spi_xfer(SPIx, color >> 8);
-            spi_xfer(SPIx, color & 0xff);
-        }
-    }
-
-    SET_CS(1);
-}
-
-void draw_stripes() {
-    cmdBuf[0] = ST7735_RAMWR;
-    sendCmd(cmdBuf, 1);
-
-    SET_DC(1);
-    SET_CS(0);
-
-    for (int i = 0; i < DISPLAY_WIDTH; ++i) {
-        uint16_t color = i;
-        for (int j = 0; j < DISPLAY_HEIGHT; ++j) {
-            spi_xfer(SPIx, color >> 8);
-            spi_xfer(SPIx, color & 0xff);
+            uint8_t cc[] = {color >> 8, color & 0xff};
+            transfer(cc, 2);
         }
     }
 
@@ -351,42 +333,53 @@ void drawBar(int y, int h, int c) {
     }
 }
 
+void draw_hf2() {
+    print4(20, 22, 5, "<-->");
+    print(40, 110, 7, "flashing...");
+    draw_screen();
+}
+
+void draw_drag() {
+    drawBar(0, 52, 10);
+    drawBar(52, 55, 8);
+    drawBar(107, 14, 4);
+
+    print4(20, 10, 1, "F401");
+    print(37, 43, 8, "UF2 v" UF2_VERSION);
+    print(3, 110, 1, "arcade.makecode.com");
+
+#define DRAG 70
+#define DRAGX 10
+    printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
+    printicon(DRAGX + 66, DRAG, 1, arrowLogo);
+    printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
+    print(1, DRAG - 12, 1, "arcade.uf2");
+    print(90, DRAG - 12, 1, "ARCD-F401");
+
+    draw_screen();
+}
+
 void screen_init() {
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_GPIOC);
 
-    rcc_periph_clock_enable(SPI_CLOCK);
-
-    setup_pin(CFG(PIN_DISPLAY_SCK), GPIO_MODE_AF);
-    setup_pin(CFG(PIN_DISPLAY_MISO), GPIO_MODE_AF);
-    setup_pin(CFG(PIN_DISPLAY_MOSI), GPIO_MODE_AF);
-    setup_pin(CFG(PIN_DISPLAY_BL), GPIO_MODE_OUTPUT);
-    setup_pin(CFG(PIN_DISPLAY_DC), GPIO_MODE_OUTPUT);
-    setup_pin(CFG(PIN_DISPLAY_RST), GPIO_MODE_OUTPUT);
-    setup_pin(CFG(PIN_DISPLAY_CS), GPIO_MODE_OUTPUT);
-
-    spi_reset(SPIx);
-    spi_disable(SPIx);
-    spi_init_master(SPIx, SPI_CR1_BAUDRATE_FPCLK_DIV_4, SPI_CR1_CPOL_CLK_TO_0_WHEN_IDLE,
-                    SPI_CR1_CPHA_CLK_TRANSITION_1, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
-    spi_enable_software_slave_management(SPIx);
-    SPI_CR1(SPIx) |= SPI_CR1_SSI;
-    spi_enable(SPIx);
+    setup_output_pin(CFG_PIN_DISPLAY_SCK);
+    setup_output_pin(CFG_PIN_DISPLAY_MOSI);
+    setup_output_pin(CFG_PIN_DISPLAY_BL);
+    setup_output_pin(CFG_PIN_DISPLAY_DC);
+    setup_output_pin(CFG_PIN_DISPLAY_RST);
+    setup_output_pin(CFG_PIN_DISPLAY_CS);
 
     SET_CS(1);
     SET_DC(1);
 
-    if (CFG(PIN_DISPLAY_BL) != -1) {
-        pin_set(CFG(PIN_DISPLAY_BL), 1);
-    }
+    pin_set(CFG_PIN_DISPLAY_BL, 1);
 
-    if (CFG(PIN_DISPLAY_RST) != -1) {
-        pin_set(CFG(PIN_DISPLAY_RST), 0);
-        delay(20);
-        pin_set(CFG(PIN_DISPLAY_RST), 1);
-        delay(20);
-    }
+    pin_set(CFG_PIN_DISPLAY_RST, 0);
+    delay(20);
+    pin_set(CFG_PIN_DISPLAY_RST, 1);
+    delay(20);
 
     sendCmdSeq(initCmds);
 
@@ -403,22 +396,5 @@ void screen_init() {
     configure(madctl, frmctr1);
     setAddrWindow(offX, offY, CFG(DISPLAY_WIDTH), CFG(DISPLAY_HEIGHT));
 
-    memset(fb, 10, sizeof(fb));
-    drawBar(0, 14, 4);
-    print(4, 3, 1, "arcade.makecode.com");
-
-    #define DRAG 25
-    #define DRAGX 10
-    printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
-    printicon(DRAGX + 65, DRAG, 1, arrowLogo);
-    printicon(DRAGX + 110, DRAG, 1, pendriveLogo);
-    print(DRAGX - 2, DRAG + 37, 1, "arcade.uf2");
-    print(DRAGX + 95, DRAG + 37, 1, "ARCADE");
-
-    drawBar(128-45, 45, 9);
-    // printicon(DISPLAY_WIDTH - 36, 90, 1, mkcdLogo);
-    printicon(5, 90, 0, kittenLogo);
-    print(40, 99, 1, USBDEVICESTRING);
-
-    draw_screen();
+    memset(fb, 0, sizeof(fb));
 }

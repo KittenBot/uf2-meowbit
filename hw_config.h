@@ -950,25 +950,12 @@
 
 #elif  defined(TARGET_HW_BRAINPAD) || defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
 
-# define APP_LOAD_ADDRESS               0x08008000
+# define UF2_FAMILY                     0x57755a57
+# define APP_LOAD_ADDRESS               0x08010000
 # define BOOTLOADER_DELAY               1000
 # define BOARD_OMNIBUSF4SD
 # define INTERFACE_USB                  1
 # define INTERFACE_USART                0
-// riven board usart for nrf comm
-# define BOARD_USART  					USART2
-# define BOARD_USART_CLOCK_REGISTER 	RCC_APB1ENR
-# define BOARD_USART_CLOCK_BIT      	RCC_APB1ENR_USART2EN
-# define BOARD_PORT_USART   			GPIOA
-# define BOARD_PORT_USART_AF 			GPIO_AF7
-# define BOARD_PIN_TX     				GPIO2
-# define BOARD_PIN_RX		     		GPIO3
-# define BOARD_PORT_BACKLIGHT  			GPIOB
-# define BOARD_PIN_BACKLIGHT     		GPIO3
-# define BOARD_USART_PIN_CLOCK_REGISTER RCC_AHB1ENR
-# define BOARD_USART_PIN_CLOCK_BIT  	RCC_AHB1ENR_IOPAEN
-# define  SERIAL_BREAK_DETECT_DISABLED   1
-
 #ifdef TARGET_HW_BRAINPAD
 # define USBDEVICESTRING                "BrainPad"
 # define OSC_FREQ                       12
@@ -981,13 +968,13 @@
 #endif
 # define OSC_FREQ                       12
 #endif
-# define USBPRODUCTID                   0x1042
+# define USBPRODUCTID                   0x1043
 
 # define BOARD_TYPE                     1042
 # define BOARD_FLASH_SECTORS            8
 # define BOARD_FLASH_SIZE               (512 * 1024)
 
-
+// Not used
 # define BOARD_PIN_LED_ACTIVITY         GPIO5
 # define BOARD_PIN_LED_BOOTLOADER       GPIO4
 # define BOARD_PORT_LEDS                GPIOB

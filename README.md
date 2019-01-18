@@ -34,3 +34,26 @@ dfu-util -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bi
 
 d:\dfutil\dfu-util.exe  -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
 ```
+```
+    // riven, adapt to meowbit
+    CFG_PIN_DISPLAY_CS,      PB_12,
+    CFG_PIN_DISPLAY_SCK,     PB_13,
+    CFG_PIN_DISPLAY_MOSI,    PB_15,
+    CFG_PIN_DISPLAY_MISO,    PB_14,
+    CFG_PIN_DISPLAY_DC,      PA_8,
+    CFG_PIN_DISPLAY_RST,     PB_10,
+    CFG_DISPLAY_WIDTH,       160,
+    CFG_DISPLAY_HEIGHT,      128,
+    CFG_DISPLAY_CFG0,        0x00000040, // 0x00020140 0x00000080
+    CFG_DISPLAY_CFG1,        0x000603, // 0x000603
+    CFG_DISPLAY_CFG2,        22,
+#if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
+    CFG_PIN_BTN_UP,          PA_6, //PA_5,
+    CFG_PIN_BTN_LEFT,        PA_7, //PA_15,
+    CFG_PIN_BTN_DOWN,        PA_5, //PB_10,
+    CFG_PIN_BTN_RIGHT,       PB_2, //PC_13,
+    CFG_PIN_BTN_A,           PB_9,// PB_1,
+    CFG_PIN_BTN_B,           PC_3,// PB_0,
+    CFG_PIN_BTN_MENU,        PC_15, // PC_10,
+    CFG_PIN_DISPLAY_BL,      PB_3, // origin PC_7, riven
+```

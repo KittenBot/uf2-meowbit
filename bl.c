@@ -46,15 +46,12 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/flash.h>
-#include <libopencm3/stm32/usart.h>
 
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
 
 #include "bl.h"
 #include "usb.h"
-
-void screen_init();
 
 inline void cinit(void *config, uint8_t interface) {
     if (interface == USB) {
@@ -67,11 +64,6 @@ inline void cfini(void) {
 }
 
 static enum led_state { LED_BLINK, LED_ON, LED_OFF } _led_state;
-#if INTERFACE_USART
-uint8_t uart_buf[512];
-uint8_t uart_cnt=0;
-uint8_t uart_state=0;
-#endif
 
 void sys_tick_handler(void);
 
@@ -95,6 +87,11 @@ void jump_to_app() {
      * complete by the host.  So if it's not 0xffffffff, we should try booting it.
      */
     if (app_base[0] == 0xffffffff) {
+        return;
+    }
+
+    // first word is stack base - needs to be in RAM region and word-aligned
+    if ((app_base[0] & 0xff000003) != 0x20000000) {
         return;
     }
 
@@ -224,7 +221,7 @@ static uint32_t crc32(const uint8_t *src, unsigned len, unsigned state) {
 #endif
 
 void usb_enumerated() {
-    timer[TIMER_BL_WAIT] = 24 * 3600 * 1000;
+    timer[TIMER_BL_WAIT] = hf2_mode ? 10 * 1000 : 24 * 3600 * 1000;
     if (ledToBlink == LED_BOOTLOADER) {
         led_off(ledToBlink);
         ledToBlink = LED_ACTIVITY;
@@ -233,13 +230,17 @@ void usb_enumerated() {
 
 int screen_on;
 
-void bootloader(unsigned timeout) {
+void start_systick() {
     /* (re)start the timer system */
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
     systick_set_reload(board_info.systick_mhz * 1000); /* 1ms tick, magic number */
     systick_interrupt_enable();
     systick_counter_enable();
+}
 
+void bootloader(unsigned timeout) {
+    start_systick();
+    
     /* if we are working with a timeout, start it running */
     if (timeout) {
         timer[TIMER_BL_WAIT] = timeout;
@@ -254,20 +255,17 @@ void bootloader(unsigned timeout) {
             return;
         }
 
-        if (!timeout || timer[TIMER_BL_WAIT] > 10000) {
+        if (!timeout || timer[TIMER_BL_WAIT] > 10000 || hf2_mode) {
             if (!screen_on) {
                 screen_on = 1;
                 screen_init();
+                if (hf2_mode)
+                    draw_hf2();
+                else
+                    draw_drag();
             }
         }
-#if INTERFACE_USART
-        if (USART_SR(BOARD_USART) & USART_SR_RXNE) { // USART_SR_RXNE // USART_FLAG_RXNE
-            uart_buf[uart_cnt++] = usart_recv(BOARD_USART);
-            if (uart_cnt == 512){
-                write_block(0, uart_buf);
-            }
-        }
-#endif
+
         usb_callback();
     }
 }

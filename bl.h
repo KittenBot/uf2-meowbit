@@ -103,7 +103,6 @@ extern int buf_get(void);
 #define arraySize(a) (sizeof((a))/sizeof(((a)[0])))
 extern void led_on(unsigned led);
 extern void led_off(unsigned led);
-extern void led_toggle(unsigned led);
 
 /* flash helpers from main_*.c */
 extern void board_deinit(void);
@@ -115,10 +114,6 @@ extern uint32_t flash_func_read_word(uint32_t address);
 extern uint32_t flash_func_read_otp(uint32_t address);
 extern uint32_t flash_func_read_sn(uint32_t address);
 
-extern uint32_t get_mcu_id(void);
-int get_mcu_desc(int max, uint8_t *revstr);
-extern int check_silicon(void);
-
 /*****************************************************************************
  * Interface in/output.
  */
@@ -129,3 +124,42 @@ extern int cin(void);
 extern void cout(uint8_t *buf, unsigned len);
 
 #define INTF_MSC                0
+#define INTF_HF2                1
+
+
+#define MSC_EP_IN 0x81
+#define MSC_EP_OUT 0x01
+
+#define HF2_EP_IN 0x82
+#define HF2_EP_OUT 0x02
+
+void resetIntoApp();
+void resetIntoBootloader();
+void flash_write(uint32_t dst, const uint8_t *src, int len);
+
+#define VALID_FLASH_ADDR(addr, sz) (USER_FLASH_START <= (addr) && (addr) + (sz) <= USER_FLASH_END)
+
+void setup_output_pin(int pincfg);
+void setup_input_pin(int pincfg);
+void setup_pin(int pincfg, int mode, int pull);
+void pin_set(int pincfg, int v);
+int pin_get(int pincfg);
+
+uint32_t pinport(int pin);
+static inline uint16_t pinmask(int pin) {
+    return 1 << (pin & 0xf);
+}
+
+extern int hf2_mode;
+
+void screen_init();
+void draw_drag();
+void draw_hf2();
+void print(int x, int y, int col, const char *text);
+void draw_screen();
+void print4(int x, int y, int col, const char *text);
+void drawBar(int y, int h, int c);
+
+void start_systick();
+
+void board_set_rtc_signature(uint32_t sig);
