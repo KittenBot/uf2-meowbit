@@ -196,7 +196,7 @@ extern const uint8_t mkcdLogo[];
 extern const uint8_t fileLogo[];
 extern const uint8_t pendriveLogo[];
 extern const uint8_t arrowLogo[];
-extern const uint8_t ghiLogo[];
+// extern const uint8_t ghiLogo[];
 extern const uint8_t kittenLogo[];
 
 static void printch(int x, int y, int col, const uint8_t *fnt) {
@@ -344,7 +344,8 @@ void draw_drag() {
     drawBar(52, 55, 8);
     drawBar(107, 14, 4);
 
-    print4(20, 10, 1, "F401");
+    print4(10, 10, 1, "Meow");
+    printicon(120, 20, 0, kittenLogo);
     print(37, 43, 8, "UF2 v" UF2_VERSION);
     print(3, 110, 1, "arcade.makecode.com");
 
@@ -354,7 +355,7 @@ void draw_drag() {
     printicon(DRAGX + 66, DRAG, 1, arrowLogo);
     printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
     print(1, DRAG - 12, 1, "arcade.uf2");
-    print(90, DRAG - 12, 1, "ARCD-F401");
+    print(90, DRAG - 12, 1, "Meowbit");
 
     draw_screen();
 }

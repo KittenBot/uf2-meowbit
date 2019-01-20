@@ -30,11 +30,14 @@ by way of (non-working) https://github.com/Microsoft/uf2-nrf5
 The dmesg subsystem is adapted from https://github.com/lancaster-university/codal-core
 
 ```
-dfu-util -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
+	arm-none-eabi-gdb --eval "target remote | openocd -f interface/stlink-v2.cfg -f target/stm32f4x.cfg -f gdb.cfg" build/braingames_revb_bl/braingames_revb_bl.elf
+	
+	make TARGETS=stm32/f4 all
+	
+	dfu-util -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
+	
+	d:\dfutil\dfu-util.exe  -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
 
-d:\dfutil\dfu-util.exe  -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braingames_revb_bl.bin
-```
-```
     // riven, adapt to meowbit
     CFG_PIN_DISPLAY_CS,      PB_12,
     CFG_PIN_DISPLAY_SCK,     PB_13,
@@ -47,7 +50,7 @@ d:\dfutil\dfu-util.exe  -a 0 -s 0x08000000 -v -D build/braingames_revb_bl/braing
     CFG_DISPLAY_CFG0,        0x00000040, // 0x00020140 0x00000080
     CFG_DISPLAY_CFG1,        0x000603, // 0x000603
     CFG_DISPLAY_CFG2,        22,
-#if defined(TARGET_HW_BRAINGAMES) || defined(TARGET_HW_BRAINGAMES_REVB)
+
     CFG_PIN_BTN_UP,          PA_6, //PA_5,
     CFG_PIN_BTN_LEFT,        PA_7, //PA_15,
     CFG_PIN_BTN_DOWN,        PA_5, //PB_10,
