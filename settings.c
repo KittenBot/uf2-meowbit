@@ -10,6 +10,7 @@ const uint32_t configData[] = {
     3, 0x17, // PIN_ACCELEROMETER_SDA = PIN_D7
     4, 0x19, // PIN_BTN_A = PB01 PB_9
     5, 0x23, // PIN_BTN_B = PB00 PC_3
+    9, 0x11, // PIN_FLASH_CS = PB_1
     13, 0x14, // PIN_LED = PC09 PB4
     14, 0x22, // PIN_LIGHT PC2
     27, 0x25, // TEMPERATURE = PC5
