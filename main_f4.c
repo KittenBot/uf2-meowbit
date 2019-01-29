@@ -117,6 +117,8 @@ mcu_des_t mcu_descriptions[] = {
 char serial_number[32];
 #define STM32_UUID ((uint32_t *)UDID_START)
 
+unsigned bootFlag = 0;
+
 static void initSerialNumber()
 {
 	writeHex(serial_number, STM32_UUID[0]);
@@ -286,6 +288,8 @@ board_init(void)
 	RCC_AHB1ENR |= RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|RCC_AHB1ENR_IOPCEN|BOARD_CLOCK_VBUS;
 
 	// make sure JACDAC line is up, otherwise trashes the bus
+	setup_input_pin(CFG_PIN_BTN_LEFT); // use left to detect bootloader mode
+
 	setup_input_pin(CFG_PIN_JACK_TX);
 
 	setup_output_pin(CFG_PIN_LED);
@@ -642,6 +646,10 @@ main(void)
 		timeout = 0;
 	}
 
+	// init bootflag, riven
+    if (pin_get(CFG_PIN_BTN_LEFT) == 0) {
+        bootFlag = 2;
+    }
 
 	/* start the interface */
 	cinit(BOARD_INTERFACE_CONFIG_USB, USB);
@@ -654,7 +662,7 @@ main(void)
 		board_set_rtc_signature(APP_RTC_SIGNATURE);
 		
 		/* run the bootloader, come back after an app is uploaded or we time out */
-		bootloader(timeout);
+		bootloader(timeout, bootFlag);
 
 		/* if the force-bootloader pins are strapped, just loop back */
 		if (board_test_force_pin()) {

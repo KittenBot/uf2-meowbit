@@ -339,7 +339,7 @@ void draw_hf2() {
     draw_screen();
 }
 
-void draw_drag() {
+void draw_drag(unsigned flag) {
     drawBar(0, 52, 10);
     drawBar(52, 55, 8);
     drawBar(107, 14, 4);
@@ -347,15 +347,19 @@ void draw_drag() {
     print4(10, 10, 1, "Meow");
     printicon(120, 20, 0, kittenLogo);
     print(37, 43, 8, "UF2 v" UF2_VERSION);
-    print(3, 110, 1, "arcade.makecode.com");
+    print(3, 110, 1, "meowbit.kittenbot.cn");
 
 #define DRAG 70
 #define DRAGX 10
-    printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
-    printicon(DRAGX + 66, DRAG, 1, arrowLogo);
-    printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
-    print(1, DRAG - 12, 1, "arcade.uf2");
-    print(90, DRAG - 12, 1, "Meowbit");
+    if (flag == 2){
+        print(DRAGX, DRAG, 1, "Usb File System");
+    } else {
+        printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
+        printicon(DRAGX + 66, DRAG, 1, arrowLogo);
+        printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
+        print(1, DRAG - 12, 1, "arcade.uf2");
+        print(90, DRAG - 12, 1, "Meowbit");
+    }
 
     draw_screen();
 }

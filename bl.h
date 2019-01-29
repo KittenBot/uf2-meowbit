@@ -67,7 +67,7 @@ struct boardinfo {
 extern struct boardinfo board_info;
 
 extern void jump_to_app(void);
-extern void bootloader(unsigned timeout);
+extern void bootloader(unsigned timeout, unsigned flag);
 extern void delay(unsigned msec);
 
 #define BL_WAIT_MAGIC	0x19710317		/* magic number in PWR regs to wait in bootloader */
@@ -153,7 +153,7 @@ static inline uint16_t pinmask(int pin) {
 extern int hf2_mode;
 
 void screen_init();
-void draw_drag();
+void draw_drag(unsigned flag);
 void draw_hf2();
 void print(int x, int y, int col, const char *text);
 void draw_screen();
