@@ -82,6 +82,8 @@ typedef struct {
 
 int write_block(uint32_t lba, const uint8_t *copy_from);
 int read_block(uint32_t block_no, uint8_t *data);
+int write_block_flash(uint32_t lba, const uint8_t *copy_from);
+int read_block_flash(uint32_t block_no, uint8_t *data);
 void ghostfat_1ms(void);
 
 typedef void (*UF2_MSC_Handover_Handler)(UF2_HandoverArgs *handover);

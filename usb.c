@@ -216,7 +216,7 @@ static void usb_set_config(usbd_device *usbd_dev, uint16_t wValue)
 void hf2_init(usbd_device *usbd_dev);
 
 void
-usb_cinit(void)
+usb_cinit(unsigned flag)
 {
 	if (hf2_mode) {
 		// disable MSC interface in HF2 mode
@@ -262,10 +262,15 @@ usb_cinit(void)
 			     usbd_control_buffer, sizeof(usbd_control_buffer));
 #endif
 
-	if (!hf2_mode)
-		usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "UF2 Bootloader",
-				"42.00", UF2_NUM_BLOCKS, read_block, write_block);
-
+	if (!hf2_mode) {
+        if (flag == 2){
+            usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "UF2 Bootloader",
+                         "42.00", UF2_NUM_BLOCKS, read_block_flash, write_block_flash);
+        } else {
+            usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "UF2 Bootloader",
+                         "42.00", UF2_NUM_BLOCKS, read_block, write_block);
+        }
+	}
 	hf2_init(usbd_dev);
 
 	winusb_setup(usbd_dev);

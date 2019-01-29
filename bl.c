@@ -46,6 +46,7 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/flash.h>
+#include <libopencm3/stm32/spi.h>
 
 #include <libopencm3/cm3/scb.h>
 #include <libopencm3/cm3/systick.h>
@@ -53,9 +54,9 @@
 #include "bl.h"
 #include "usb.h"
 
-inline void cinit(void *config, uint8_t interface) {
+inline void cinit(void *config, uint8_t interface, unsigned flag) {
     if (interface == USB) {
-        return usb_cinit();
+        return usb_cinit(flag);
     }
 }
 
@@ -245,6 +246,19 @@ void bootloader(unsigned timeout, unsigned flag) {
     if (timeout) {
         timer[TIMER_BL_WAIT] = timeout;
     }
+    // spi2 pin pb12~15
+    rcc_periph_clock_enable(RCC_GPIOB);
+    rcc_periph_clock_enable(RCC_SPI2);
+
+    gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13 | GPIO14 | GPIO15);
+    gpio_set_af(GPIOB, GPIO_AF5, GPIO13 | GPIO14 | GPIO15);
+
+    spi_reset(SPI2);
+    spi_init_master(SPI2, SPI_CR1_BAUDRATE_FPCLK_DIV_4, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+                    SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+    spi_enable_software_slave_management(SPI2);
+    spi_set_nss_high(SPI2);
+    spi_enable(SPI2);
 
     /* make the LED blink while we are idle */
     led_set(LED_BLINK);
@@ -259,10 +273,11 @@ void bootloader(unsigned timeout, unsigned flag) {
             if (!screen_on) {
                 screen_on = 1;
                 screen_init();
-                if (hf2_mode)
+                if (hf2_mode) {
                     draw_hf2();
-                else
+                }else {
                     draw_drag(flag);
+                }
             }
         }
 

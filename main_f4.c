@@ -652,7 +652,7 @@ main(void)
     }
 
 	/* start the interface */
-	cinit(BOARD_INTERFACE_CONFIG_USB, USB);
+	cinit(BOARD_INTERFACE_CONFIG_USB, USB, bootFlag);
 
 
 	while (1) {
