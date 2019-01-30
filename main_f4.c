@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/flash.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/systick.h>
@@ -296,6 +297,22 @@ board_init(void)
 	setup_output_pin(CFG_PIN_LED1);
 
 	initSerialNumber();
+
+	// spi2 pin pb12~15
+	rcc_periph_clock_enable(RCC_GPIOB);
+	rcc_periph_clock_enable(RCC_SPI2);
+	setup_output_pin(CFG_PIN_FLASH_CS);
+	pin_set(CFG_PIN_FLASH_CS, 1);
+
+	gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13 | GPIO14 | GPIO15);
+	gpio_set_af(GPIOB, GPIO_AF5, GPIO13 | GPIO14 | GPIO15);
+
+	spi_reset(SPI2);
+	spi_init_master(SPI2, SPI_CR1_BAUDRATE_FPCLK_DIV_4, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+					SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+	spi_enable_software_slave_management(SPI2);
+	spi_set_nss_high(SPI2);
+	spi_enable(SPI2);
 }
 
 void

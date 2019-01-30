@@ -268,7 +268,7 @@ usb_cinit(unsigned flag)
                          "42.00", UF2_NUM_BLOCKS, read_block_flash, write_block_flash);
         } else {
             usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "UF2 Bootloader",
-                         "42.00", UF2_NUM_BLOCKS, read_block, write_block);
+                         "42.00", 4096, read_block, write_block); // 2M flash, 512 byte per block
         }
 	}
 	hf2_init(usbd_dev);

@@ -35,20 +35,21 @@
 #define W25X_ManufactDeviceID		0x90
 #define W25X_JedecDeviceID			0x9F
 
-
 void W25X_Read_Sector(uint32_t addr, uint8_t* pBuffer, uint32_t size)
 {
     uint16_t i;
 
     pin_set(CFG_PIN_FLASH_CS, 0);
-    spi_send(SPI2, W25X_ReadData);
-    spi_send(SPI2, (uint8_t)(addr >> 16));
-    spi_send(SPI2, (uint8_t)(addr>> 8));
-    spi_send(SPI2, (uint8_t) addr);
+    spi_xfer(SPI2, W25X_ReadData);
+    spi_xfer(SPI2, (uint8_t)(addr >> 16));
+    spi_xfer(SPI2, (uint8_t)(addr>> 8));
+    spi_xfer(SPI2, (uint8_t) addr & 0xff);
+
 
     for(i=0;i<size;i++)
     {
-        pBuffer[i] = spi_read(SPI2);
+        // spi_send(SPI2, 0xff);
+        pBuffer[i] = spi_xfer(SPI2, 0xff);
     }
     pin_set(CFG_PIN_FLASH_CS, 1);
 }
@@ -56,13 +57,14 @@ void W25X_Read_Sector(uint32_t addr, uint8_t* pBuffer, uint32_t size)
 int read_block_flash(uint32_t block_no, uint8_t *data) {
     memset(data, 0, 512);
     uint32_t addr = block_no * 512;
-    DMESG("read block %d", block_no);
+    // DMESG("rd: %d %x", block_no, addr);
     W25X_Read_Sector(addr, data, 512);
+    DMESG("read block %d %x %x %x %x %x %x", addr, data[0], data[1], data[2], data[3], data[4], data[5]);
     return 0;
 }
 
 int write_block_flash(uint32_t lba, const uint8_t *copy_from) {
-
+    DMESG("wr: %d", lba);
     return 0;
 }
 

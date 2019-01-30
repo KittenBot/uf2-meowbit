@@ -81,7 +81,7 @@ void transfer(uint8_t *ptr, uint32_t len) {
 
 void spi_transfer(uint8_t *ptr, uint32_t len){
     for (uint32_t i=0;i<len;i++){
-        spi_send(SPI2, ptr[i]);
+        spi_xfer(SPI2, ptr[i]);
     }
 }
 
@@ -381,9 +381,6 @@ void screen_init() {
     setup_output_pin(CFG_PIN_DISPLAY_DC);
     setup_output_pin(CFG_PIN_DISPLAY_RST);
     setup_output_pin(CFG_PIN_DISPLAY_CS);
-
-    setup_output_pin(CFG_PIN_FLASH_CS);
-
 
     //setup_pin(CFG_PIN_DISPLAY_MISO, GPIO_MODE_INPUT, GPIO_PUPD_NONE); // float for MISO
 
