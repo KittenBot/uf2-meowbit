@@ -679,7 +679,7 @@ main(void)
         start_systick();
         DMESG("Draw drag flash mode");
         screen_init();
-        draw_drag(bootFlag);
+        draw_usbfs();
         screen_on = 1;
         // spi_test();
 	}

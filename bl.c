@@ -269,7 +269,7 @@ void bootloader(unsigned timeout) {
                 if (hf2_mode) {
                     draw_hf2();
                 }else {
-                    draw_drag(bootFlag);
+                    draw_drag();
                 }
             }
         }

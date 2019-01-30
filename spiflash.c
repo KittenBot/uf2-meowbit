@@ -95,7 +95,7 @@ void erase_sector(uint32_t sec){
     spi_xfer(SPI2, (uint8_t) addr & 0xff);
     pin_set(CFG_PIN_FLASH_CS, 1);
     W25X_Wait_Busy();
-    DMESG("Erase Sector %d", sec);
+    //DMESG("Erase Sector %d", sec);
 }
 
 int flush_current_sector()
@@ -104,6 +104,7 @@ int flush_current_sector()
     erase_sector(opSector);
     uint32_t addr = opSector * FLASH_SECTOR_SIZE;
     uint8_t * pBuffer = secBuf;
+    led_on(LED_BOOTLOADER);
     for(j=0;j<FLASH_PAGES_PER_SECTOR;j++)
     {
         W25X_Write_Cmd(W25X_WriteEnable);
@@ -123,7 +124,8 @@ int flush_current_sector()
         pin_set(CFG_PIN_FLASH_CS, 1);
         W25X_Wait_Busy();
     }
-    DMESG("flush %d %x", opSector, addr);
+    led_off(LED_BOOTLOADER);
+    //DMESG("flush %d %x", opSector, addr);
     secDirty = false;
     secDirtyCounter = 0;
     return 0;
@@ -132,14 +134,14 @@ int flush_current_sector()
 int read_block_flash(uint32_t block_no, uint8_t *data) {
     uint32_t secIdx = block_no / 8;
     uint8_t blkIdx = block_no % 8;
-    DMESG("rd: %d", block_no);
+    //DMESG("rd: %d", block_no);
     if (secIdx != opSector){
         if (secDirty){
             flush_current_sector();
         }
         opSector = secIdx;
         dump_sector(opSector);
-        DMESG("#1 dump %d", opSector);
+        //DMESG("#1 dump %d", opSector);
         //DMESG("Dump new sector %d", opSector);
         //DMESG("read block %d %x %x %x %x %x %x", block_no, secBuf[0], secBuf[1], secBuf[2], secBuf[3], secBuf[4], secBuf[5]);
     }
@@ -150,14 +152,14 @@ int read_block_flash(uint32_t block_no, uint8_t *data) {
 int write_block_flash(uint32_t block_no, const uint8_t *data) {
     uint32_t secIdx = block_no / 8;
     uint8_t blkIdx = block_no % 8;
-    DMESG("wr: %d", block_no);
+    //DMESG("wr: %d", block_no);
     if (secIdx != opSector){
         if (secDirty){
             flush_current_sector();
         }
         opSector = secIdx;
         dump_sector(opSector);
-        DMESG("#2 dump %d", opSector);
+       // DMESG("#2 dump %d", opSector);
     }
     memcpy(secBuf+blkIdx*512, data, 512);
     secDirty = true;

@@ -345,7 +345,16 @@ void draw_hf2() {
     draw_screen();
 }
 
-void draw_drag(unsigned flag) {
+void draw_usbfs(){
+    drawBar(0, 52, 7);
+    drawBar(107, 14, 4);
+    print4(10, 10, 1, "File");
+    print(5, 70, 1, "USB <-> SPI Flash");
+    print(3, 110, 1, "meowbit.kittenbot.cn");
+    draw_screen();
+}
+
+void draw_drag() {
     drawBar(0, 52, 10);
     drawBar(52, 55, 8);
     drawBar(107, 14, 4);
@@ -357,15 +366,11 @@ void draw_drag(unsigned flag) {
 
 #define DRAG 70
 #define DRAGX 10
-    if (flag == 2){
-        print(DRAGX, DRAG, 1, "Usb File System");
-    } else {
-        printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
-        printicon(DRAGX + 66, DRAG, 1, arrowLogo);
-        printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
-        print(1, DRAG - 12, 1, "arcade.uf2");
-        print(90, DRAG - 12, 1, "Meowbit");
-    }
+    printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
+    printicon(DRAGX + 66, DRAG, 1, arrowLogo);
+    printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
+    print(1, DRAG - 12, 1, "arcade.uf2");
+    print(90, DRAG - 12, 1, "Meowbit");
 
     draw_screen();
 }
