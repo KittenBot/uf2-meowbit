@@ -553,7 +553,7 @@ int hf2_mode = 0;
 void warning_screen(uint32_t);
 
 extern int screen_on;
-
+extern void spi_test();
 int
 main(void)
 {
@@ -681,6 +681,7 @@ main(void)
         screen_init();
         draw_drag(bootFlag);
         screen_on = 1;
+        // spi_test();
 	}
 
     /* start the interface */

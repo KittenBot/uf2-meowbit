@@ -53,6 +53,8 @@
 #include "bl.h"
 #include "usb.h"
 
+extern unsigned bootFlag;
+
 inline void cinit(void *config, uint8_t interface, unsigned flag) {
     if (interface == USB) {
         return usb_cinit(flag);
@@ -132,6 +134,7 @@ void jump_to_app() {
 
 volatile unsigned timer[NTIMERS];
 void ghostfat_1ms();
+void flush_1ms();
 
 static int16_t blOn, blDl = 40, blDir = 1;
 static int ledToBlink = LED_BOOTLOADER;
@@ -139,7 +142,11 @@ static int ledToBlink = LED_BOOTLOADER;
 void sys_tick_handler(void) {
     unsigned i;
 
-    ghostfat_1ms();
+    if (bootFlag != 2){
+        ghostfat_1ms();
+    } else {
+        flush_1ms();
+    }
 
     for (i = 0; i < NTIMERS; i++)
         if (timer[i] > 0) {
@@ -238,7 +245,6 @@ void start_systick() {
     systick_counter_enable();
 }
 
-extern unsigned bootFlag;
 void bootloader(unsigned timeout) {
     start_systick();
     
