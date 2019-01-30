@@ -238,7 +238,8 @@ void start_systick() {
     systick_counter_enable();
 }
 
-void bootloader(unsigned timeout, unsigned flag) {
+extern unsigned bootFlag;
+void bootloader(unsigned timeout) {
     start_systick();
     
     /* if we are working with a timeout, start it running */
@@ -256,13 +257,13 @@ void bootloader(unsigned timeout, unsigned flag) {
         }
 
         if (!timeout || timer[TIMER_BL_WAIT] > 10000 || hf2_mode) {
-            if (!screen_on && flag != 2) {
+            if (!screen_on && bootFlag != 2) {
                 screen_on = 1;
                 screen_init();
                 if (hf2_mode) {
                     draw_hf2();
                 }else {
-                    draw_drag(flag);
+                    draw_drag(bootFlag);
                 }
             }
         }
