@@ -79,6 +79,12 @@ void transfer(uint8_t *ptr, uint32_t len) {
     }
 }
 
+void spi_transfer(uint8_t *ptr, uint32_t len){
+    for (uint32_t i=0;i<len;i++){
+        spi_xfer(SPI2, ptr[i]);
+    }
+}
+
 #define DELAY 0x80
 
 // clang-format off
@@ -124,14 +130,14 @@ static void sendCmd(uint8_t *buf, int len) {
     SET_DC(0);
     SET_CS(0);
 
-    transfer(buf, 1);
+    spi_transfer(buf, 1);
 
     SET_DC(1);
 
     len--;
     buf++;
     if (len > 0)
-        transfer(buf, len);
+        spi_transfer(buf, len);
 
     SET_CS(1);
 }
@@ -320,7 +326,7 @@ void draw_screen() {
         for (int j = 0; j < DISPLAY_HEIGHT; ++j) {
             uint16_t color = palette[*p++ & 0xf];
             uint8_t cc[] = {color >> 8, color & 0xff};
-            transfer(cc, 2);
+            spi_transfer(cc, 2);
         }
     }
 
@@ -339,6 +345,15 @@ void draw_hf2() {
     draw_screen();
 }
 
+void draw_usbfs(){
+    drawBar(0, 52, 7);
+    drawBar(107, 14, 4);
+    print4(10, 10, 1, "File");
+    print(5, 70, 1, "USB <-> SPI Flash");
+    print(3, 110, 1, "meowbit.kittenbot.cn");
+    draw_screen();
+}
+
 void draw_drag() {
     drawBar(0, 52, 10);
     drawBar(52, 55, 8);
@@ -347,7 +362,7 @@ void draw_drag() {
     print4(10, 10, 1, "Meow");
     printicon(120, 20, 0, kittenLogo);
     print(37, 43, 8, "UF2 v" UF2_VERSION);
-    print(3, 110, 1, "arcade.makecode.com");
+    print(3, 110, 1, "meowbit.kittenbot.cn");
 
 #define DRAG 70
 #define DRAGX 10
@@ -365,12 +380,14 @@ void screen_init() {
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_GPIOC);
 
-    setup_output_pin(CFG_PIN_DISPLAY_SCK);
-    setup_output_pin(CFG_PIN_DISPLAY_MOSI);
+    //setup_output_pin(CFG_PIN_DISPLAY_SCK);
+    //setup_output_pin(CFG_PIN_DISPLAY_MOSI);
     setup_output_pin(CFG_PIN_DISPLAY_BL);
     setup_output_pin(CFG_PIN_DISPLAY_DC);
     setup_output_pin(CFG_PIN_DISPLAY_RST);
     setup_output_pin(CFG_PIN_DISPLAY_CS);
+
+    //setup_pin(CFG_PIN_DISPLAY_MISO, GPIO_MODE_INPUT, GPIO_PUPD_NONE); // float for MISO
 
     SET_CS(1);
     SET_DC(1);

@@ -118,7 +118,7 @@ extern uint32_t flash_func_read_sn(uint32_t address);
  * Interface in/output.
  */
 
-extern void cinit(void *config, uint8_t interface);
+extern void cinit(void *config, uint8_t interface, unsigned flag);
 extern void cfini(void);
 extern int cin(void);
 extern void cout(uint8_t *buf, unsigned len);
@@ -155,6 +155,7 @@ extern int hf2_mode;
 void screen_init();
 void draw_drag();
 void draw_hf2();
+void draw_usbfs();
 void print(int x, int y, int col, const char *text);
 void draw_screen();
 void print4(int x, int y, int col, const char *text);

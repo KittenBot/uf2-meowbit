@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
+#include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/flash.h>
 #include <libopencm3/stm32/usart.h>
 #include <libopencm3/cm3/systick.h>
@@ -116,6 +117,8 @@ mcu_des_t mcu_descriptions[] = {
 
 char serial_number[32];
 #define STM32_UUID ((uint32_t *)UDID_START)
+
+unsigned bootFlag = 0;
 
 static void initSerialNumber()
 {
@@ -286,12 +289,34 @@ board_init(void)
 	RCC_AHB1ENR |= RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|RCC_AHB1ENR_IOPCEN|BOARD_CLOCK_VBUS;
 
 	// make sure JACDAC line is up, otherwise trashes the bus
+	setup_input_pin(CFG_PIN_BTN_LEFT); // use left to detect bootloader mode
+
 	setup_input_pin(CFG_PIN_JACK_TX);
 
 	setup_output_pin(CFG_PIN_LED);
 	setup_output_pin(CFG_PIN_LED1);
 
 	initSerialNumber();
+
+}
+
+static void initSpi(){
+    // spi2 pin pb12~15
+    rcc_periph_clock_enable(RCC_GPIOB);
+    rcc_periph_clock_enable(RCC_SPI2);
+    setup_output_pin(CFG_PIN_FLASH_CS);
+    pin_set(CFG_PIN_FLASH_CS, 1);
+
+    gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13 | GPIO14 | GPIO15);
+    gpio_set_af(GPIOB, GPIO_AF5, GPIO13 | GPIO14 | GPIO15);
+
+    spi_reset(SPI2);
+    spi_init_master(SPI2, SPI_CR1_BAUDRATE_FPCLK_DIV_4, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+                    SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+    spi_enable_software_slave_management(SPI2);
+    spi_set_nss_high(SPI2);
+    spi_enable(SPI2);
+    DMESG("SPI2 init");
 }
 
 void
@@ -527,6 +552,8 @@ int hf2_mode = 0;
 
 void warning_screen(uint32_t);
 
+extern int screen_on;
+extern void spi_test();
 int
 main(void)
 {
@@ -555,6 +582,7 @@ main(void)
 	/* configure the clock for bootloader activity */
 	clock_init();
 
+    initSpi();
 	#ifdef BL_FLASHER
 	
 	flash_bootloader();
@@ -642,10 +670,22 @@ main(void)
 		timeout = 0;
 	}
 
+	// init bootflag, riven
+    if (pin_get(CFG_PIN_BTN_LEFT) == 0) {
+        bootFlag = 2;
+    }
 
-	/* start the interface */
-	cinit(BOARD_INTERFACE_CONFIG_USB, USB);
+	if (bootFlag == 2 && hf2_mode == 0){
+        start_systick();
+        DMESG("Draw drag flash mode");
+        screen_init();
+        draw_usbfs();
+        screen_on = 1;
+        // spi_test();
+	}
 
+    /* start the interface */
+    cinit(BOARD_INTERFACE_CONFIG_USB, USB, bootFlag);
 
 	while (1) {
 		DMESG("enter bootloader, tmo=%d", timeout);

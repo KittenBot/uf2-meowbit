@@ -35,6 +35,6 @@
 #pragma once
 
 
-extern void usb_cinit(void);
+extern void usb_cinit(unsigned flag);
 extern void usb_cfini(void);
 extern void usb_callback(void);

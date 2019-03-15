@@ -42,14 +42,26 @@ const uint32_t configData[] = {
     65, 0x18, // PIN_JACK_SND = PA08 PB_8
     // 66, 0x28, // PIN_JACK_BUSLED = PC08
     // 67, 0x29, // PIN_JACK_COMMLED = PC09
-    70, 0x38, // ACCELEROMETER_TYPE = MMA8453
-    151, 0x2, // PIN_D1 = PA02
-    152, 0x3, // PIN_D2 = PA03
-    153, 0x13, // PIN_D3 = PB03
-    154, 0x14, // PIN_D4 = PB04
-    155, 0x15, // PIN_D5 = PB05
-    156, 0x16, // PIN_D6 = PB06
-    157, 0x17, // PIN_D7 = PB07
+    70, 0x68, // ACCELEROMETER_TYPE = MPU6050
+    103, 0x10, // PIN_A3 PB0
+    100, 0x00, // PIN_A0 PA0
+    104, 0x20, // PIN_A4 PC0
+    154, 0x15, // PIN_D4 PB5  LED act
+    159, 0x27, // PIN_D9 PC7
+    152, 0x0A, // PIN_D2 PA10
+    101, 0x01, // PIN_A1 PA1
+    102, 0x04, // PIN_A2 PA4
+    // U6 tx 
+    105, 0x20, // PIN_A5 PC0
+    153, 0x13, // PIN_D3 PB3 -- tft bl
+    150, 0x03, // PIN_D0 PA3
+    151, 0x02, // PIN_D1 PA2
+    // external spi
+    23, 0x2A, // PIN_SCK PC10
+    18, 0x2B, // PIN_MISO PC11
+    19, 0x2C, // PIN_MOSI PC12
+    163, 0x0F, // PIN_SS, PIN_D13 PA_15
+
     204, 0x80000, // FLASH_BYTES = 0x80000
     205, 0x18000, // RAM_BYTES = 0x18000
     208, 0x16e42d61, // BOOTLOADER_BOARD_ID = 0x16e42d61
