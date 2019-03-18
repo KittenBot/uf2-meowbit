@@ -261,7 +261,7 @@ usb_cinit(unsigned flag)
 	usbd_dev = usbd_init(&st_usbfs_v1_usb_driver, &dev, &config, usb_strings, NUM_USB_STRINGS,
 			     usbd_control_buffer, sizeof(usbd_control_buffer));
 #endif
-
+	// riven
 	if (!hf2_mode) {
         if (flag == 2){
             usb_msc_init(usbd_dev, MSC_EP_IN, 64, MSC_EP_OUT, 64, USBMFGSTRING, "SPI Flash",

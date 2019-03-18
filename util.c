@@ -1,6 +1,9 @@
 #include <libopencm3/stm32/spi.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
+#include <libopencm3/stm32/exti.h>
+#include <libopencm3/stm32/f4/nvic.h>
+#include <libopencm3/cm3/cortex.h>
 
 #include <string.h>
 
@@ -29,6 +32,8 @@ uint32_t pinport(int pin) {
 
 void setup_pin(int pincfg, int mode, int pull) {
     int pin = lookupCfg(pincfg, -1);
+    if (pincfg <= 0)
+        pin = -pincfg;
     if (pin < 0)
         return;
     uint32_t port = pinport(pin);
@@ -37,8 +42,35 @@ void setup_pin(int pincfg, int mode, int pull) {
     gpio_set_output_options(port, GPIO_OTYPE_PP, GPIO_OSPEED_50MHZ, mask);
 }
 
+void enable_exti(int pincfg) {
+    int pin = lookupCfg(pincfg, -1);
+    if (pincfg <= 0)
+        pin = -pincfg;
+    if (pin < 0)
+        return;
+    uint32_t port = pinport(pin);
+    uint32_t mask = pinmask(pin);
+
+    exti_select_source(mask, port);
+	exti_set_trigger(mask, EXTI_TRIGGER_BOTH);
+    exti_enable_request(mask);
+    exti_reset_request(mask);
+
+#if 0
+    int irq = NVIC_EXTI0_IRQ;
+    pin &= 0xf;
+    if (pin <= 4) irq += pin;
+    else if (pin <= 9) irq = NVIC_EXTI9_5_IRQ;
+    else irq = NVIC_EXTI15_10_IRQ;
+    nvic_clear_pending_irq(irq);
+    nvic_set_priority(irq, 0);
+    nvic_enable_irq(irq);
+#endif
+}
+
 void setup_output_pin(int pincfg) {
     setup_pin(pincfg, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE);
+    pin_set(pincfg, 0);
 }
 
 void setup_input_pin(int pincfg) {
@@ -47,6 +79,8 @@ void setup_input_pin(int pincfg) {
 
 void pin_set(int pincfg, int v) {
     int pin = lookupCfg(pincfg, -1);
+    if (pincfg <= 0)
+        pin = -pincfg;
     if (pin < 0)
         return;
     if (v) {

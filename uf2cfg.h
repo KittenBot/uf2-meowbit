@@ -1,4 +1,4 @@
-#define UF2_VERSION "2.3.1"
+#define UF2_VERSION "2.3.6"
 #define BOARD_ID "STM32F401-MEOWBIT"
 #define INDEX_URL "https://arcade.makecode.com"
 #define UF2_NUM_BLOCKS 8000

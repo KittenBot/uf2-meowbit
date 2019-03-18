@@ -13,6 +13,8 @@ const uint32_t configData[] = {
     9, 0x11, // PIN_FLASH_CS = PB_1
     13, 0x14, // PIN_LED = PC09 PB4
     14, 0x22, // PIN_LIGHT PC2
+    24, 0x16, // PIN_SCL
+    25, 0x17, // PIN_SDA
     27, 0x25, // TEMPERATURE = PC5
     32, 0x1d, // PIN_DISPLAY_SCK = PB13
     33, 0x1e, // PIN_DISPLAY_MISO = PB14
@@ -34,6 +36,7 @@ const uint32_t configData[] = {
     50, 0x05, // PIN_BTN_DOWN = PB10 PA_5
     51, 0x2F, // PIN_BTN_MENU = PC10 PC_15
     55, 0x15, // PIN_LED1 = PC08 PB5
+    59, 255, // speaker volume
     60, 0x9, // PIN_JACK_TX = PA09
     //61, 0x6, // PIN_JACK_SENSE = PA06
     //62, 0x4, // PIN_JACK_HPEN = PA04
@@ -53,7 +56,7 @@ const uint32_t configData[] = {
     102, 0x04, // PIN_A2 PA4
     // U6 tx 
     105, 0x20, // PIN_A5 PC0
-    153, 0x13, // PIN_D3 PB3 -- tft bl
+    153, 0x26, // PIN_D3 PC6
     150, 0x03, // PIN_D0 PA3
     151, 0x02, // PIN_D1 PA2
     // external spi
