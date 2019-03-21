@@ -16,6 +16,8 @@
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/cm3/scb.h>
 
+#include <libopencmsis/core_cm3.h>
+
 #include "bl.h"
 #include <string.h>
 
@@ -133,8 +135,6 @@ typedef struct mcu_rev_t {
 	char  rev;
 } mcu_rev_t;
 
-#define APP_SIZE_MAX			(BOARD_FLASH_SIZE - (BOOTLOADER_RESERVATION_SIZE + APP_RESERVATION_SIZE))
-
 /* context passed to cinit */
 #if INTERFACE_USB
 # define BOARD_INTERFACE_CONFIG_USB  	NULL
@@ -142,9 +142,7 @@ typedef struct mcu_rev_t {
 
 /* board definition */
 struct boardinfo board_info = {
-	.board_type	= BOARD_TYPE,
 	.board_rev	= 0,
-	.fw_size	= 0,
 
 #ifdef STM32F401
 	.systick_mhz	= 84,
@@ -159,7 +157,11 @@ static void board_init(void);
 #define APP_RTC_SIGNATURE           0x24a22d12
 #define POWER_DOWN_RTC_SIGNATURE    0x5019684f // Written by app fw to not re-power on.
 #define HF2_RTC_SIGNATURE           0x39a63a78
+#define SLEEP_RTC_ARG               0x10b37889
+#define SLEEP2_RTC_ARG              0x7e3353b7
+
 #define BOOT_RTC_REG                MMIO32(RTC_BASE + 0x50)
+#define ARG_RTC_REG                MMIO32(RTC_BASE + 0x54)
 
 /* standard clocking for all F4 boards */
 static struct rcc_clock_scale clock_setup = {
@@ -191,13 +193,15 @@ static struct rcc_clock_scale clock_setup = {
 };
 
 static uint32_t
-board_get_rtc_signature()
+board_get_rtc_signature(uint32_t *arg)
 {
 	/* enable the backup registers */
 	PWR_CR |= PWR_CR_DBP;
 	RCC_BDCR |= RCC_BDCR_RTCEN;
 
 	uint32_t result = BOOT_RTC_REG;
+	if (arg)
+		*arg = ARG_RTC_REG;
 
 	/* disable the backup registers */
 	RCC_BDCR &= RCC_BDCR_RTCEN;
@@ -207,13 +211,14 @@ board_get_rtc_signature()
 }
 
 void
-board_set_rtc_signature(uint32_t sig)
+board_set_rtc_signature(uint32_t sig, uint32_t arg)
 {
 	/* enable the backup registers */
 	PWR_CR |= PWR_CR_DBP;
 	RCC_BDCR |= RCC_BDCR_RTCEN;
 
 	BOOT_RTC_REG = sig;
+	ARG_RTC_REG = arg;
 
 	/* disable the backup registers */
 	RCC_BDCR &= RCC_BDCR_RTCEN;
@@ -280,10 +285,8 @@ board_test_force_pin()
 static void
 board_init(void)
 {
-	/* fix up the max firmware size, we have to read memory to get this */
-	board_info.fw_size = APP_SIZE_MAX;
-
 	RCC_APB1ENR |= RCC_APB1ENR_PWREN;
+	RCC_APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 	
 	// enable all GPIO clocks
 	RCC_AHB1ENR |= RCC_AHB1ENR_IOPAEN|RCC_AHB1ENR_IOPBEN|RCC_AHB1ENR_IOPCEN|BOARD_CLOCK_VBUS;
@@ -552,8 +555,61 @@ int hf2_mode = 0;
 
 void warning_screen(uint32_t);
 
-extern int screen_on;
-extern void spi_test();
+#define PWR_CR_LPLVDS (1 << 10)
+void deepsleep() {
+
+	setup_output_pin(CFG_PIN_JACK_BZEN);
+	setup_output_pin(CFG_PIN_JACK_HPEN);
+	setup_output_pin(CFG_PIN_JACK_PWREN);
+	setup_output_pin(CFG_PIN_JACK_SND);
+	setup_output_pin(CFG_PIN_SPEAKER_AMP);
+
+	// this is needed for the BOOT0 circuit
+	setup_output_pin(CFG_PIN_BTN_MENU2);
+
+	setup_input_pin(CFG_PIN_BTN_A);
+	setup_input_pin(CFG_PIN_BTN_B);
+	setup_input_pin(CFG_PIN_BTN_LEFT);
+	setup_input_pin(CFG_PIN_BTN_RIGHT);
+	setup_input_pin(CFG_PIN_BTN_UP);
+	setup_input_pin(CFG_PIN_BTN_DOWN);
+
+  screen_sleep();
+
+	setup_input_pin(CFG_PIN_BTN_MENU);
+
+#if 0
+	RCC_AHB1LPENR = 0x1900F;
+  RCC_AHB2LPENR = 0x0;
+  RCC_APB1LPENR = 0x10000000;
+  RCC_APB2LPENR = 0x00004000;
+#endif
+
+	__disable_irq();
+	
+	for (;;) {
+		enable_exti(CFG_PIN_BTN_MENU);
+	
+		PWR_CR |= PWR_CR_FPDS | PWR_CR_LPDS | PWR_CR_LPLVDS;
+		SCB->SCR |= SCB_SCR_SLEEPDEEP;
+		asm("wfe");
+	
+		clock_init();
+	
+		int d = 0;
+		for (;;d += 50) {
+			screen_delay(50);
+			if (pin_get(CFG_PIN_BTN_MENU) == 1)
+				break;
+			if (d > 1000)
+				pin_set(CFG_PIN_DISPLAY_BL, 1);
+		}
+		if (d > 1000) {
+			resetIntoApp();
+		}
+	}
+}
+
 int
 main(void)
 {
@@ -568,8 +624,8 @@ main(void)
 	/* Here we check for the app setting the POWER_DOWN_RTC_SIGNATURE
 	 * in this case, we reset the signature and wait to die
 	 */
-	if (board_get_rtc_signature() == POWER_DOWN_RTC_SIGNATURE) {
-		board_set_rtc_signature(0);
+	if (board_get_rtc_signature(0) == POWER_DOWN_RTC_SIGNATURE) {
+		board_set_rtc_signature(0, 0);
 
 		while (1);
 	}
@@ -589,20 +645,45 @@ main(void)
 
 	#else
 
-	uint32_t bootSig = board_get_rtc_signature();
+	uint32_t bootArg = 0;
+	uint32_t bootSig = board_get_rtc_signature(&bootArg);
 
-	if (FLASH_OPTCR & 0x80030000) {
+	if (lookupCfg(CFG_BOOTLOADER_PROTECTION, 0) && (FLASH_OPTCR & 0x80030000)) {
 		warning_screen(bootSig);
 	}
 
 	DMESG("bootsig: %p", bootSig);
+
+
+	if (bootSig == APP_RTC_SIGNATURE && bootArg == SLEEP_RTC_ARG) {
+		// next time show instructions
+		board_set_rtc_signature(APP_RTC_SIGNATURE, SLEEP2_RTC_ARG);
+		deepsleep();
+	}
+
+	if (bootSig == APP_RTC_SIGNATURE && bootArg == SLEEP2_RTC_ARG) {
+		screen_init();
+		draw_hold_menu();
+		setup_input_pin(CFG_PIN_BTN_MENU);
+		for (int i = 0; i < 200; ++i) {
+			screen_delay(10);
+			// if they touch MENU while the instruction screen is on,
+			// just stop the sleep and boot into app
+			if (pin_get(CFG_PIN_BTN_MENU) == 0) {
+				bootArg = 0;
+				break;
+			}
+		}
+		if (bootArg)
+			deepsleep();
+	}
 
 	/*
 	* Clear the signature so that if someone resets us while we're
 	* in the bootloader we'll try to boot next time.
 	*/
 	if (bootSig)
-		board_set_rtc_signature(0);
+		board_set_rtc_signature(0, 0);
 
 	//bootSig = HF2_RTC_SIGNATURE;
 
@@ -691,7 +772,7 @@ main(void)
 		DMESG("enter bootloader, tmo=%d", timeout);
 
 		// if they hit reset the second time, go to app
-		board_set_rtc_signature(APP_RTC_SIGNATURE);
+		board_set_rtc_signature(APP_RTC_SIGNATURE, 0);
 		
 		/* run the bootloader, come back after an app is uploaded or we time out */
 		bootloader(timeout);
@@ -701,7 +782,7 @@ main(void)
 			continue;
 		}
 
-		board_set_rtc_signature(0);
+		board_set_rtc_signature(0, 0);
 
 		/* look to see if we can boot the app */
 		jump_to_app();
@@ -717,12 +798,12 @@ void flushFlash(void);
 
 void resetIntoApp() {
 	flushFlash();
-	board_set_rtc_signature(APP_RTC_SIGNATURE);
+	board_set_rtc_signature(APP_RTC_SIGNATURE, 0);
 	scb_reset_system();
 }
 
 void resetIntoBootloader() {
 	flushFlash();
-	board_set_rtc_signature(BOOT_RTC_SIGNATURE);
+	board_set_rtc_signature(BOOT_RTC_SIGNATURE, 0);
 	scb_reset_system();
 }

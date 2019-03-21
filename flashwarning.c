@@ -39,7 +39,7 @@ void warning_screen(uint32_t bootSig) {
         return;
     }
 
-    board_set_rtc_signature(WARNING_RTC_SIG);
+    board_set_rtc_signature(WARNING_RTC_SIG, 0);
 
     screen_init();
 
@@ -48,7 +48,7 @@ void warning_screen(uint32_t bootSig) {
 
     print(10, 20, 2,
           " This bootloader\n"
-          "update may DEMAGE\n"
+          "update may DAMAGE\n"
           "  your device!");
 
     draw_menu();

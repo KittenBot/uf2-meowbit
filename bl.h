@@ -57,9 +57,7 @@ enum {
 
 /* board info forwarded from board-specific code to booloader */
 struct boardinfo {
-	uint32_t	board_type;
 	uint32_t	board_rev;
-	uint32_t	fw_size;
 	uint32_t	systick_mhz;		/* systick input clock */
 
 } __attribute__((packed));
@@ -141,6 +139,7 @@ void flash_write(uint32_t dst, const uint8_t *src, int len);
 
 void setup_output_pin(int pincfg);
 void setup_input_pin(int pincfg);
+void enable_exti(int pincfg);
 void setup_pin(int pincfg, int mode, int pull);
 void pin_set(int pincfg, int v);
 int pin_get(int pincfg);
@@ -152,10 +151,12 @@ static inline uint16_t pinmask(int pin) {
 
 extern int hf2_mode;
 
+void screen_delay(unsigned msec);
+void screen_sleep();
 void screen_init();
 void draw_drag();
 void draw_hf2();
-void draw_usbfs();
+void draw_hold_menu();
 void print(int x, int y, int col, const char *text);
 void draw_screen();
 void print4(int x, int y, int col, const char *text);
@@ -163,4 +164,4 @@ void drawBar(int y, int h, int c);
 
 void start_systick();
 
-void board_set_rtc_signature(uint32_t sig);
+void board_set_rtc_signature(uint32_t sig, uint32_t arg);

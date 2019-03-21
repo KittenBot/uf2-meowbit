@@ -105,7 +105,7 @@ void jump_to_app() {
         return;
     }
 
-    if (app_base[1] >= (APP_LOAD_ADDRESS + board_info.fw_size)) {
+    if (app_base[1] >= (APP_LOAD_ADDRESS + BOARD_FLASH_SIZE)) {
         return;
     }
 
@@ -263,16 +263,16 @@ void bootloader(unsigned timeout) {
         }
 
         if (!timeout || timer[TIMER_BL_WAIT] > 10000 || hf2_mode) {
-            if (!screen_on && bootFlag != 2) {
+            if (!screen_on) {
                 screen_on = 1;
                 screen_init();
-                if (hf2_mode) {
+                if (hf2_mode)
                     draw_hf2();
-                }else {
+                else
                     draw_drag();
-                }
             }
         }
+
         usb_callback();
     }
 }

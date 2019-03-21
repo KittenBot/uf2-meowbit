@@ -1,3 +1,5 @@
+#include <stdint.h>
+#define DEFINE_CONFIGDATA 1
 #include "bl.h"
 
 __attribute__((section(".config"))) __attribute__((used)) //
