@@ -397,9 +397,10 @@ static void pre_init() {
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOB);
     rcc_periph_clock_enable(RCC_GPIOC);
+    rcc_periph_clock_enable(RCC_SPI2);
 
-    setup_output_pin(CFG_PIN_DISPLAY_SCK);
-    setup_output_pin(CFG_PIN_DISPLAY_MOSI);
+    //setup_output_pin(CFG_PIN_DISPLAY_SCK);
+    //setup_output_pin(CFG_PIN_DISPLAY_MOSI);
     setup_output_pin(CFG_PIN_DISPLAY_BL);
     setup_output_pin(CFG_PIN_DISPLAY_DC);
     setup_output_pin(CFG_PIN_DISPLAY_RST);
@@ -407,6 +408,19 @@ static void pre_init() {
 
     SET_CS(1);
     SET_DC(1);
+
+    // riven, enable hardware spi
+    //setup_pin(CFG_PIN_DISPLAY_MISO, GPIO_MODE_INPUT, GPIO_PUPD_NONE); // float for MISO
+    // spi2 pin pb12~15
+    gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO13 | GPIO14 | GPIO15);
+    gpio_set_af(GPIOB, GPIO_AF5, GPIO13 | GPIO14 | GPIO15);
+
+    spi_reset(SPI2);
+    spi_init_master(SPI2, SPI_CR1_BAUDRATE_FPCLK_DIV_4, SPI_CR1_CPOL_CLK_TO_1_WHEN_IDLE,
+                    SPI_CR1_CPHA_CLK_TRANSITION_2, SPI_CR1_DFF_8BIT, SPI_CR1_MSBFIRST);
+    spi_enable_software_slave_management(SPI2);
+    spi_set_nss_high(SPI2);
+    spi_enable(SPI2);
 
     pin_set(CFG_PIN_DISPLAY_RST, 0);
     screen_delay(20);
