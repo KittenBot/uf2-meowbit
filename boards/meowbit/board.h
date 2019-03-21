@@ -1,12 +1,12 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#define OSC_FREQ 8
-#define USBDEVICESTRING "BrainPad Arcade"
-#define USBMFGSTRING "GHI Electronics"
+#define OSC_FREQ 12
+#define USBDEVICESTRING "MeowBit V1"
+#define USBMFGSTRING "Kittenbot"
 #define BOARD_FLASH_SECTORS 8
 #define BOARD_FLASH_SIZE (512 * 1024)
-#define BOARD_ID "STM32F401-BrainPad-Arcade-RevA"
+#define BOARD_ID "STM32F401-MEOWBIT"
 
 
 #ifdef DEFINE_CONFIGDATA
@@ -14,7 +14,7 @@ __attribute__((section(".config"))) __attribute__((used)) //
 const uint32_t configData[] = {
     /* CF2 START */
     513675505, 539130489, // magic
-    47, 100,  // used entries, total entries
+    57, 100,  // used entries, total entries
     1, 0x2e, // PIN_ACCELEROMETER_INT = PC14
     2, 0x16, // PIN_ACCELEROMETER_SCL = PIN_D6
     3, 0x17, // PIN_ACCELEROMETER_SDA = PIN_D7

@@ -610,6 +610,7 @@ void deepsleep() {
 	}
 }
 
+extern int screen_on;
 int
 main(void)
 {
