@@ -639,7 +639,7 @@ main(void)
 	/* configure the clock for bootloader activity */
 	clock_init();
 
-    initSpi();
+	initSpi();
 	#ifdef BL_FLASHER
 	
 	flash_bootloader();
