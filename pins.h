@@ -188,3 +188,24 @@
 #define CFG_PINS_PORT_SIZE 210
 #define CFG_BOOTLOADER_PROTECTION 211
 
+#define CFG_PIN_P0 400
+#define CFG_PIN_P1 401
+#define CFG_PIN_P2 402
+#define CFG_PIN_P3 403
+#define CFG_PIN_P4 404
+#define CFG_PIN_P5 405
+#define CFG_PIN_P6 406
+#define CFG_PIN_P7 407
+#define CFG_PIN_P8 408
+#define CFG_PIN_P9 409
+#define CFG_PIN_P10 410
+#define CFG_PIN_P11 411
+#define CFG_PIN_P12 412
+#define CFG_PIN_P13 413
+#define CFG_PIN_P14 414
+#define CFG_PIN_P15 415
+#define CFG_PIN_P16 416
+#define CFG_PIN_P17 417
+#define CFG_PIN_P18 418
+#define CFG_PIN_P19 419
+#define CFG_PIN_P20 420

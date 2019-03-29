@@ -1,6 +1,8 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+#include "../../pins.h"
+
 #define OSC_FREQ 12
 #define USBDEVICESTRING "MeowBit V1"
 #define USBMFGSTRING "Kittenbot"
@@ -80,8 +82,26 @@ const uint32_t configData[] = {
     208, 0x16e42d61, // BOOTLOADER_BOARD_ID = 0x16e42d61
     209, 0x57755a57, // UF2_FAMILY = STM32F401
     210, 0x10, // PINS_PORT_SIZE = PA_16
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+    // edge connectors
+    CFG_PIN_P0, PA_0,
+    CFG_PIN_P1, PA_1,
+    CFG_PIN_P2, PA_4,
+    CFG_PIN_P3, PB_0,
+    CFG_PIN_P4, PC_1,
+    CFG_PIN_P5, PB_5,
+    CFG_PIN_P6, PC_7,
+    CFG_PIN_P7, PA_10,
+    CFG_PIN_P8, PA_4,
+    CFG_PIN_P9, PC_6,
+    CFG_PIN_P10, PC_0,
+    CFG_PIN_P11, PB_3,
+    CFG_PIN_P12, PA_2,
+    CFG_PIN_P13, PC_10,
+    CFG_PIN_P14, PC_11,
+    CFG_PIN_P15, PC_12,
+    CFG_PIN_P16, PA_15,
+
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     /* CF2 END */
