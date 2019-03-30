@@ -2,6 +2,21 @@
 
 This implements USB mass storage flashing using [UF2 format](https://github.com/Microsoft/uf2)
 
+## Big Notice
+
+You may get the latest compiled bootloader flasher from https://cdn.kittenbot.cn/meowbit/meowbit-flasher.uf2
+
+And you may go into spi-flash mode by holding the `left button` during reset.
+
+![](https://s2.ax1x.com/2019/02/18/k6llTg.jpg)
+
+The internal spi-flash will mount as a thumb disk, format it or copy anything you like to it. 
+
+## Static resource and firmware
+
+* 12x12 unicode binary https://cdn.kittenbot.cn/meowbit/unicode12.bin
+* micropython firmware https://cdn.kittenbot.cn/meowbit/meowpy.uf2
+
 ## Build instructions
 
 To build just run ``make`` in this folder.
