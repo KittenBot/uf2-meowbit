@@ -4,8 +4,16 @@
 
 #include <string.h>
 
+void printicon(int x, int y, int col, const uint8_t *icon);
+#define DEFINE_CUSTOM_LOGO 1
+
 #include "pins.h"
 #include "bl.h"
+
+#ifndef CUSTOM_LOGO
+#define CUSTOM_LOGO  /* nothing */
+#endif
+
 
 #define DISPLAY_WIDTH 160
 #define DISPLAY_HEIGHT 128
@@ -217,7 +225,7 @@ extern const uint8_t arrowLogo[];
 extern const uint8_t kittenLogo[];
 
 static void printch(int x, int y, int col, const uint8_t *fnt) {
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 6; ++i) {
         uint8_t *p = fb + (x + i) * DISPLAY_HEIGHT + y;
         uint8_t mask = 0x01;
         for (int j = 0; j < 8; ++j) {
@@ -231,7 +239,7 @@ static void printch(int x, int y, int col, const uint8_t *fnt) {
 }
 
 static void printch4(int x, int y, int col, const uint8_t *fnt) {
-    for (int i = 0; i < 8 * 4; ++i) {
+    for (int i = 0; i < 6 * 4; ++i) {
         uint8_t *p = fb + (x + i) * DISPLAY_HEIGHT + y;
         uint8_t mask = 0x01;
         for (int j = 0; j < 8; ++j) {
@@ -311,8 +319,8 @@ void print(int x, int y, int col, const char *text) {
         if (c >= 0x7f)
             c = '?';
         c -= ' ';
-        printch(x, y, col, &font8[c * 8]);
-        x += 8;
+        printch(x, y, col, &font8[c * 6]);
+        x += 6;
     }
 }
 
@@ -320,8 +328,8 @@ void print4(int x, int y, int col, const char *text) {
     while (*text) {
         char c = *text++;
         c -= ' ';
-        printch4(x, y, col, &font8[c * 8]);
-        x += 8 * 4;
+        printch4(x, y, col, &font8[c * 6]);
+        x += 6 * 4;
     }
 }
 
@@ -371,23 +379,32 @@ void draw_hold_menu() {
     draw_screen();
 }
 
+void print4border(int x, int y, int c, const char *str) {
+    print4(x - 1, y - 1, 15, str);
+    print4(x + 1, y - 1, 15, str);
+    print4(x - 1, y + 1, 15, str);
+    print4(x + 1, y + 1, 15, str);
+    print4(x, y, c, str);
+}
+
 void draw_drag() {
     drawBar(0, 52, 10);
     drawBar(52, 55, 8);
     drawBar(107, 14, 4);
 
-    print4(10, 10, 1, "Meow");
-    printicon(120, 20, 0, kittenLogo);
-    print(37, 43, 8, "UF2 v" UF2_VERSION);
-    print(3, 110, 1, "meowbit.kittenbot.cn");
+    print4border(109, 5, 1, "F4");
+    print(112, 40, 8, "v" UF2_VERSION);
+    print(23, 110, 1, "arcade.makecode.com");
+
+    CUSTOM_LOGO;
 
 #define DRAG 70
 #define DRAGX 10
     printicon(DRAGX + 20, DRAG + 5, 1, fileLogo);
     printicon(DRAGX + 66, DRAG, 1, arrowLogo);
     printicon(DRAGX + 108, DRAG, 1, pendriveLogo);
-    print(1, DRAG - 12, 1, "arcade.uf2");
-    print(90, DRAG - 12, 1, "Meowbit");
+    print(10, DRAG - 12, 1, "arcade.uf2");
+    print(98, DRAG - 12, 1, "ARCADE-F4");
 
     draw_screen();
 }
