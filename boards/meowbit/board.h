@@ -10,7 +10,6 @@
 #define BOARD_FLASH_SIZE (512 * 1024)
 #define BOARD_ID "STM32F401-MEOWBIT"
 
-
 #ifdef DEFINE_CONFIGDATA
 __attribute__((section(".config"))) __attribute__((used)) //
 const uint32_t configData[] = {
@@ -53,7 +52,7 @@ const uint32_t configData[] = {
     //61, 0x6, // PIN_JACK_SENSE = PA06
     //62, 0x4, // PIN_JACK_HPEN = PA04
     // 63, 0x18, // PIN_JACK_BZEN = PA10 PB8
-    // 64, 0x7, // PIN_JACK_PWREN = PA07
+    64, PC_4, // PIN_JACK_PWREN = PA07
     65, 0x18, // PIN_JACK_SND = PA08 PB_8
     // 66, 0x28, // PIN_JACK_BUSLED = PC08
     // 67, 0x29, // PIN_JACK_COMMLED = PC09
@@ -106,6 +105,26 @@ const uint32_t configData[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     /* CF2 END */
 };
+
 #endif
+
+
+#ifdef DEFINE_CUSTOM_LOGO
+
+const uint8_t kittenLogo[] = {
+32, 32, 68, 191, 191, 191, 142, 63, 149, 208, 143, 63, 124, 31, 140, 15, 124, 31, 139, 79, 124, 63, 140, 47, 126, 63, 64, 115, 113, 202, 135, 125, 211, 135, 113, 125, 203, 138, 7, 207, 138, 7, 207, 136, 79, 120, 202, 135, 63, 121, 203, 137, 31, 208, 139,
+213, 142, 209, 146, 206, 147, 205, 148, 203, 150, 201, 152, 199, 191, 191, 169
+};
+
+static void customLogo() {
+    printicon(2, 5, 15, kittenLogo);
+    print(35, 25, 1, "Meowbit");
+    print(10, 40, 1, "by kittenbot team");
+}
+
+#define CUSTOM_LOGO customLogo()
+
+#endif
+
 
 #endif /* BOARD_H */

@@ -561,6 +561,8 @@ void deepsleep() {
 	setup_output_pin(CFG_PIN_JACK_BZEN);
 	setup_output_pin(CFG_PIN_JACK_HPEN);
 	setup_output_pin(CFG_PIN_JACK_PWREN);
+	pin_set(CFG_PIN_JACK_PWREN, 0); // shutdown the power output
+
 	setup_output_pin(CFG_PIN_JACK_SND);
 	setup_output_pin(CFG_PIN_SPEAKER_AMP);
 

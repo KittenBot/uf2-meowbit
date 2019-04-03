@@ -5,6 +5,9 @@
 #include <string.h>
 
 void printicon(int x, int y, int col, const uint8_t *icon);
+void print(int x, int y, int col, const char *text);
+void print4(int x, int y, int col, const char *text);
+
 #define DEFINE_CUSTOM_LOGO 1
 
 #include "pins.h"
@@ -369,7 +372,7 @@ void draw_usbfs(){
     drawBar(107, 14, 4);
     print4(10, 10, 1, "File");
     print(5, 70, 1, "USB <-> SPI Flash");
-    print(3, 110, 1, "meowbit.kittenbot.cn");
+    print(3, 110, 1, "meowbit.kittenbot.cc");
     draw_screen();
 }
 
