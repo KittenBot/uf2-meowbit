@@ -75,6 +75,7 @@ const uint32_t configData[] = {
     18, 0x2B, // PIN_MISO PC11
     19, 0x2C, // PIN_MOSI PC12
     163, 0x0F, // PIN_SS, PIN_D13 PA_15
+    165, 0x28, // PIN_SS, PIN_D15 PC8, SD slot in spi mode
 
     204, 0x80000, // FLASH_BYTES = 0x80000
     205, 0x18000, // RAM_BYTES = 0x18000

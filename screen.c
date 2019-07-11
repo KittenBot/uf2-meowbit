@@ -258,7 +258,7 @@ static void printch4(int x, int y, int col, const uint8_t *fnt) {
     }
 }
 
-static void printicon(int x, int y, int col, const uint8_t *icon) {
+void printicon(int x, int y, int col, const uint8_t *icon) {
     int w = *icon++;
     int h = *icon++;
     int sz = *icon++;
