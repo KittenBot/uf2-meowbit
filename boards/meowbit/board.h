@@ -86,7 +86,7 @@ const uint32_t configData[] = {
     // edge connectors
     CFG_PIN_P0, PA_0,
     CFG_PIN_P1, PA_1,
-    CFG_PIN_P2, PA_4,
+    CFG_PIN_P2, PA_2,
     CFG_PIN_P3, PB_0,
     CFG_PIN_P4, PC_1,
     CFG_PIN_P5, PB_5,
@@ -96,11 +96,13 @@ const uint32_t configData[] = {
     CFG_PIN_P9, PC_6,
     CFG_PIN_P10, PC_0,
     CFG_PIN_P11, PB_3,
-    CFG_PIN_P12, PA_2,
+    CFG_PIN_P12, PA_3,
     CFG_PIN_P13, PC_10,
     CFG_PIN_P14, PC_11,
     CFG_PIN_P15, PC_12,
     CFG_PIN_P16, PA_15,
+    CFG_PIN_P19, PC_8, // hack to expose sdio-d0
+    CFG_PIN_P20, PC_9,
 
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
